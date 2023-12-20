@@ -5,15 +5,22 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretest": "eslint server.js"
   },
   "author": "Hirok Adhikary",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
+    "fuse.js": "^7.0.0",
     "node": "^21.2.0"
   },
   "devDependencies": {
+    "eslint": "^8.55.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.4.0",
+    "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.0.2"
   }
 }
