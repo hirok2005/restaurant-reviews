@@ -1,15 +1,15 @@
 {
-  "name": "assignment1",
+  "name": "restaurant-review",
   "version": "1.0.0",
-  "description": "assignment1 work",
-  "main": "index.js",
+  "description": "website that allows users to see information about restaurant and upcoming events, and write reviews about the restaurants",
+  "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pretest": "eslint server.js"
   },
   "author": "Hirok Adhikary",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "fuse.js": "^7.0.0",

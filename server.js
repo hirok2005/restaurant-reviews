@@ -1,27 +1,46 @@
 const Fuse = require('fuse.js');
 const express = require('express');
+const fs = require('fs');
 const app = express();
 
-const options = { keys: ['name'] };
+const filterName = { keys: ['name', 'style'] };
 
-const restaurants = require('./data.json').restaurants;
-const reviews = require('./data.json').reviews;
-const events = require('./data.json').events;
+const data = JSON.parse(fs.readFileSync('./data.json'));
 
-const f = new Fuse(restaurants, options);
+const restaurants = data.restaurants;
+const reviews = data.reviews;
+const events = data.events;
 
 app.use(express.static('client'));
 
 app.get('/restaurants/', function (request, response) {
+    console.log(request);
     let filterRestaurants = restaurants;
-    console.log(Object.keys(request.query));
-    if (Object.keys(request.query).length !== 0 && Object.values(request.query).slice(1).some(values => values !== '')) {
-        filterRestaurants = f.search(`${request.query.name} ${request.query.desc}`).map(item => item.item);
+    if (request.query.name !== undefined && request.query.name !== '') {
+        const f = new Fuse(filterRestaurants, filterName);
+        filterRestaurants = f.search(request.query.name).map(item => item.item);
     }
-    filterRestaurants = filterRestaurants.filter(restaurant => restaurant.rating >= parseInt(request.query.rating));
+    if (request.query.city !== undefined && request.query.city !== '') {
+        filterRestaurants = filterRestaurants.filter(restaurant => restaurant.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
+    }
+    if (request.query.rating !== undefined) {
+        filterRestaurants = filterRestaurants.filter(restaurant => restaurant.rating >= parseInt(request.query.rating));
+    }
+    response.json(filterRestaurants.map((restaurant) => ({ id: restaurant.id, name: restaurant.name })));
+});
 
-    console.log(filterRestaurants);
-    response.send(filterRestaurants);
+app.get('/restaurant/', function (request, response) {
+    for (const restaurant of restaurants) {
+        if (request.query.id !== undefined && request.query.id === restaurant.id) {
+            response.json(restaurant);
+            return;
+        }
+    }
+    response.sendStatus(404);
+});
+
+app.get('/favicon.ico', function (request, response) {
+    response.sendFile('./client/favicon.ico');
 });
 
 app.use(function (request, response) {

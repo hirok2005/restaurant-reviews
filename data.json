@@ -1,211 +1,315 @@
 {
     "restaurants": [
         {
+            "id": "Turtl3605309",
             "name": "Turtle Bay Durham",
             "rating": 4.9,
             "description": "Caribbean restaurant seriving authentic food in the heart of Durham. Choose from a variety of items which the chefs will prepare with care, while you get a great view of the Durham cathedral",
             "style": "Caribbean",
             "phone_number": "0191 359 2130",
-            "address": {
-                "street": "Unit R07 The Riverwalk",
-                "city": "Durham",
-                "address": "DH1 4SL"
-            },
-            "currently-open": false,
-            "opening-times": [
-                "Sunday 11 am-11 pm",
-                "Monday 11 am-11 pm",
-                "Tuesday 11 am-11 pm",
-                "Wednesday 11 am-11 pm",
-                "Thursday 11 am-2 am",
-                "Friday 11 am-2 am",
-                "Saturday 10 am-2 am"
+            "address": [
+                "Unit R07 The Riverwalk",
+                "Newcastle",
+                "DH1 4SL"
+            ],
+            "opening_times": [
+                [
+                    11,
+                    23
+                ],
+                [
+                    11,
+                    23
+                ],
+                [
+                    11,
+                    23
+                ],
+                [
+                    11,
+                    2
+                ],
+                [
+                    11,
+                    2
+                ],
+                [
+                    10,
+                    2
+                ],
+                [
+                    11,
+                    23
+                ]
             ]
         },
         {
+            "id": "Tapas3605309",
             "name": "Tapas Factory",
             "rating": 4.3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
             "style": "Spanish",
             "phone_number": "0191 384 5578",
-            "address": {
-                "street": "14 Elvet Bridge",
-                "city": "Durham",
-                "address": "DH1 3AA"
-            },
-            "currently-open": false,
-            "opening-times": [
-                "Sunday 12 pm -10 pm",
-                "Monday 12 pm -11 pm",
-                "Tuesday 12 pm-11 pm",
-                "Wednesday 12 pm-11 pm",
-                "Thursday 12 pm-11 pm",
-                "Friday 12 pm-11 pm",
-                "Saturday 12 pm-11 pm"
+            "address": [
+                "14 Elvet Bridge",
+                "Durham",
+                "DH1 3AA"
+            ],
+            "opening_times": [
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    23
+                ],
+                [
+                    12,
+                    22
+                ]
             ]
         },
         {
+            "id": "TheFo3605309",
             "name": "The Food Pit",
             "rating": 4.2,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
             "style": "food hall",
             "phone_number": "0191 406 3002",
-            "address": {
-                "street": "1 Framwelgate Waterside",
-                "city": "Durham",
-                "address": "DH1 4SL"
-            },
-            "currently-open": false,
-            "opening-times": [
-                "Sunday 11 am-9 pm",
-                "Monday 11 am-9 pm",
-                "Tuesday 11 am-9 pm",
-                "Wednesday 11 am-9 pm",
-                "Thursday 11 am-9 pm",
-                "Friday 11 am-9 pm",
-                "Saturday 11 am-9 pm"
+            "address": [
+                "1 Framwelgate Waterside",
+                "Durham",
+                "DH1 4SL"
+            ],
+            "opening_times": [
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ]
             ]
         },
         {
+            "id": "FatHi3605309",
             "name": "Fat Hippo Durham",
             "rating": 4.4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
             "style": "Burgers",
             "phone_number": "0191 370 9699",
-            "address": {
-                "street": "36 Saddler Street",
-                "city": "Durham",
-                "address": "DH1 3NU"
-            },
-            "currently-open": false,
-            "opening-times": [
-                "Sunday 11 am-9 pm",
-                "Monday 11 am-9 pm",
-                "Tuesday 11 am-9 pm",
-                "Wednesday 11 am-9 pm",
-                "Thursday 11 am-9 pm",
-                "Friday 11 am-9 pm",
-                "Saturday 11 am-9 pm"
+            "address": [
+                "36 Saddler Street",
+                "Durham",
+                "DH1 3NU"
+            ],
+            "opening_times": [
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ],
+                [
+                    11,
+                    21
+                ]
             ]
         }
     ],
     "reviews": [
         {
             "restaurant": "Turtle Bay Durham",
+            "id": "",
             "name": "username1",
             "rating": 5,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Turtle Bay Durham",
+            "id": "",
             "name": "username2",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Turtle Bay Durham",
+            "id": "",
             "name": "username3",
             "rating": 3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Turtle Bay Durham",
+            "id": "",
             "name": "username4",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Turtle Bay Durham",
+            "id": "",
             "name": "username5",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Tapas Factory",
+            "id": "",
             "name": "username1",
             "rating": 5,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Tapas Factory",
+            "id": "",
             "name": "username2",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Tapas Factory",
+            "id": "",
             "name": "username3",
             "rating": 3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Tapas Factory",
+            "id": "",
             "name": "username4",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Tapas Factory",
+            "id": "",
             "name": "username5",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "The Food Pit",
+            "id": "",
             "name": "username1",
             "rating": 5,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "The Food Pit",
+            "id": "",
             "name": "username2",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "The Food Pit",
+            "id": "",
             "name": "username3",
             "rating": 3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "The Food Pit",
+            "id": "",
             "name": "username4",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "The Food Pit",
+            "id": "",
             "name": "username5",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Fat Hippo Durham",
+            "id": "",
             "name": "username1",
             "rating": 5,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Fat Hippo Durham",
+            "id": "",
             "name": "username2",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Fat Hippo Durham",
+            "id": "",
             "name": "username3",
             "rating": 3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Fat Hippo Durham",
+            "id": "",
             "name": "username4",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
         },
         {
             "restaurant": "Fat Hippo Durham",
+            "id": "",
             "name": "username5",
             "rating": 4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur."
