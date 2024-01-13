@@ -2,12 +2,22 @@ h1, h5 {
     text-align: center;
 }
 
+textarea {
+    max-height: 200px;
+}
+
 .dropdown-menu {
     max-width: 250px;
 }
 
 #city {
     max-width: 220px;;
+}
+
+/* https://stackoverflow.com/questions/53871453/position-of-absolute-element-changes-when-innerhtml-is-changed
+fixes the problem where changing inner html would shift the element */
+#search-form, #searchTypeName, #formCollapse {
+    width: 100vw;
 }
 
 #is_open[color_code="false"]{ color: red}

@@ -1,64 +1,102 @@
 let searchType = 1; // 1 for restaurants 0 for events
-const searchHtml = `<h1 style="text-align:center" id="searchTypeName">Restaurants</h1>
+const searchHtml = `<h1 id="searchTypeName" class="mx-auto">Restaurants</h1>
 <form id="search-form">
-  <div class="input-group mx-auto w-75">
-    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-      aria-expanded="false">Filters</button>
-    <ul class="dropdown-menu">
-      <li>
-        <div class="p-2" id="ratings">
-          <h5>Rating</h5>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="0">
-              <input class="form-check-input" type="radio" name="rating" id="0" value="0" checked="checked">
-              0 and up
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="1">
-              <input class="form-check-input" type="radio" name="rating" id="1" value="1">
-              1 and up
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="2">
-              <input class="form-check-input" type="radio" name="rating" id="2" value="2">
-              2 and up
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="3">
-              <input class="form-check-input" type="radio" name="rating" id="3" value="3">
-              3 and up
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="4">
-              <input class="form-check-input" type="radio" name="rating" id="4" value="4">
-              4 and up
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label" for="5">
-              <input class="form-check-input" type="radio" name="rating" id="5" value="5">
-              5 and up
-            </label>
-          </div>
-        </div>
-      </li>
-      <li>
-        <div class="p-2"><input class="form-control w-auto btn-sm btn-md-none" id="city" name="city" type="text"
-            placeholder="City" /></div>
-      </li>
-    </ul>
-    <input id="name" name="name" type="text" class="form-control" aria-label="Text input with dropdown button" />
-    <button class="btn btn-primary btn-sm btn-md-none" type="submit">Search</button>
-  </div>
+    <div class="input-group mx-auto w-75">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">Filters</button>
+        <ul class="dropdown-menu">
+            <li>
+                <div class="p-2" id="ratings">
+                    <h5>Rating</h5>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="0">
+                            <input class="form-check-input" type="radio" name="rating" id="0" value="0"
+                                checked="checked">
+                            0 and up
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="1">
+                            <input class="form-check-input" type="radio" name="rating" id="1" value="1">
+                            1 and up
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="2">
+                            <input class="form-check-input" type="radio" name="rating" id="2" value="2">
+                            2 and up
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="3">
+                            <input class="form-check-input" type="radio" name="rating" id="3" value="3">
+                            3 and up
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="4">
+                            <input class="form-check-input" type="radio" name="rating" id="4" value="4">
+                            4 and up
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <label class="form-check-label" for="5">
+                            <input class="form-check-input" type="radio" name="rating" id="5" value="5">
+                            5 and up
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="p-2"><input class="form-control w-auto btn-sm btn-md-none" id="city" name="city" type="text"
+                        placeholder="City" /></div>
+            </li>
+        </ul>
+        <input id="name" name="name" type="text" class="form-control" aria-label="Text input with dropdown button" />
+        <button class="btn btn-primary btn-sm btn-md-none" type="submit">Search</button>
+    </div>
 </form>
-<div class="container container-sm container-md-none">
-  <div id="results" class="row row-cols-sm-2 row-cols-md-3 p-5 mb-2"></div>
+    <div id="results" class="row row-cols-sm-2 row-cols-md-3 p-5 w-75 mx-auto"></div>
+<div class="container container-sm container-md-none w-100">
+    <p class="d-inline-flex gap-1 w-100">
+        <a class="btn btn-primary btn-block" data-bs-toggle="collapse" href="#collapseForm" role="button" aria-expanded="false"
+            aria-controls="collapseForm" id="collapseLabel">
+            Add a restaurant
+        </a>
+    </p>
+    <div class="collapse" id="collapseForm">
+        <div class="card card-body">
+            <form id="create-form">
+                <div class="mb-3">
+                    <label for="name" class="form-label" id="nameLabel">Restaurant Name</label>
+                    <input type="text" class="form-control" id="nameForm">
+                </div>
+                <div class="mb-3">
+                  <label for="desc" class="form-label">Description</label>
+                  <textarea class="form-control" id="desc" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="street" class="form-label" id="streetLabel">Street</label>
+                    <input type="text" class="form-control" id="street">
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label" id="cityLabel">City</label>
+                    <input type="text" class="form-control" id="cityzz">
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label" id="addressLabel">Address</label>
+                    <input type="text" class="form-control" id="address">
+                </div>
+                <div class="mb-3">
+                    <label for="phoneNumber" class="form-label" id="phoneNumberLabel">Phone Number</label>
+                    <input type="tel" class="form-control" id="phoneNumber">
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+        </div>
 </div>
-</div>`;
+</div>
+`;
 const restaurantButton = document.getElementById('restaurant');
 // TODO make error pages nice
 
@@ -188,10 +226,12 @@ function changeType (type) {
     if (type === 1) {
         document.getElementById('searchTypeName').innerHTML = 'Restaurants';
         document.getElementById('ratings').removeAttribute('hidden');
+        document.getElementById('collapseLabel').innerHTML = 'Add a restaurant';
         return;
     }
     document.getElementById('searchTypeName').innerHTML = 'Events';
     document.getElementById('ratings').setAttribute('hidden', 'hidden');
+    document.getElementById('collapseLabel').innerHTML = 'Add an event';
 }
 
 restaurantButton.addEventListener('click', async function (event) {

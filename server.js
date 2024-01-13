@@ -80,18 +80,16 @@ app.get('/review/', function (request, response) {
 
 app.get('/events/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
-    response.json([]);
-    // return;
-    // let filterEvents = events;
-    // // console.log(filterReviews);
-    // if (request.query.eventID !== undefined && request.query.eventID !== '') {
-    //     filterEvents = eventSearch.search(request.query.eventID).map(item => item.item);
-    // }
-    // if (request.query.city !== undefined && request.query.city !== '') {
-    //     filterEvents = filterEvents.filter(event => event.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
-    // }
-    // // console.log(filterReviews);
-    // response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name })));
+    let filterEvents = events;
+    // console.log(filterReviews);
+    if (request.query.eventID !== undefined && request.query.eventID !== '') {
+        filterEvents = eventSearch.search(request.query.eventID).map(item => item.item);
+    }
+    if (request.query.city !== undefined && request.query.city !== '') {
+        filterEvents = filterEvents.filter(event => event.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
+    }
+    // console.log(filterReviews);
+    response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name })));
 });
 
 app.get('/event/', function (request, response) {
