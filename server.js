@@ -10,7 +10,6 @@ const restaurants = data.restaurants;
 const reviews = data.reviews;
 const events = data.events;
 const restaurantSearch = new Fuse(restaurants, { keys: ['name', 'style'] });
-const reviewSearch = new Fuse(reviews, { keys: ['restaurantID'] });
 const eventSearch = new Fuse(events, { keys: ['eventID'] });
 
 app.use(express.static('client'));
@@ -52,7 +51,7 @@ app.get('/reviews/', function (request, response) {
     let filterReviews = reviews;
     console.log(filterReviews);
     if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
-        filterReviews = reviewSearch.search(request.query.restaurantID).map(item => item.item);
+        filterReviews = reviews.filter(review => review.restaurantID === request.query.restaurantID);
     }
     if (request.query.rating !== undefined) {
         filterReviews = filterReviews.filter(review => review.rating >= parseInt(request.query.rating));
@@ -109,18 +108,28 @@ app.get('/event/', function (request, response) {
     response.sendStatus(404);
 });
 
-// app.get('/img/', function (request, response) {
-//     response.setHeaderx
-// })
+app.post('/restaurants/add', function (request, response) {
+    console.log(request);
+    //
+});
 
-app.use(function (request, response) {
-    if (request.accepts('html')) {
-        // TODO: make a nice 404 page
-        response.status(404).send('<h1>HTML 404 Page not found</h1>');
-    } else {
+app.get('/images/', function (request, response) {
+    try {
+        response.sendFile(path.join(__dirname, 'images', request.query.ID, 'jpeg'));
+    } catch (e) {
+        response.setHeader('content-Type', 'image/jpeg');
         response.sendStatus(404);
     }
 });
 
-app.listen(8090);
-console.log('server running on port 8090');
+app.use(function (request, response) {
+    if (request.accepts('html')) {
+        // TODO: make a nice 404 page
+        response.status(500).send('<h1>505 Internal</h1>');
+    } else {
+        response.sendStatus(500);
+    }
+});
+
+app.listen(8080);
+console.log('server running on port 8080');

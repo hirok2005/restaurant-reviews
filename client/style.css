@@ -1,4 +1,4 @@
-h1, h5 {
+h1, h5, h6 {
     text-align: center;
 }
 
@@ -11,7 +11,14 @@ textarea {
 }
 
 #city {
-    max-width: 220px;;
+    max-width: 220px;
+}
+
+/* adding scroll bar from https://stackoverflow.com/questions/40112618/bootstrap4-adding-scrollbar-to-div */
+#reviews {
+    height: 250px;
+    width: 400px;
+    overflow-y: auto;
 }
 
 /* https://stackoverflow.com/questions/53871453/position-of-absolute-element-changes-when-innerhtml-is-changed
