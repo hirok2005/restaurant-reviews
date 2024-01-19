@@ -138,7 +138,7 @@
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
-  <div id="info">
+  <div id="info" style="display: none;">
     <h1 class="mx-auto" id="nameTitle"></h1>
     <h6 id="currentlyOpen"></h6>
     <div class="p-5" id="img"></div>
@@ -190,7 +190,7 @@
         <h2>Events</h2>
         <div class="overflow-auto" id="events"></div>
       </div>
-    </div>  
+    </div>
     <div class="container container-sm container-md-none w-100">
       <p class="d-inline-flex gap-1 w-100">
         <a class="btn btn-primary btn-block" data-bs-toggle="collapse" href="#collapseFormReview" role="button"
@@ -211,7 +211,7 @@
             </div>
             <div class="mb-3">
               <label for="descReview" class="form-label">Description</label>
-              <textarea class="form-control" id="descReview" required></textarea>
+              <textarea class="form-control" id="descReview" minlength="10" required></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Rating</label>

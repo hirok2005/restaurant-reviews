@@ -3,6 +3,7 @@ const Fuse = require('fuse.js');
 const express = require('express');
 const fs = require('fs');
 const app = express();
+app.use(express.json());
 
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json')));
 
@@ -48,14 +49,12 @@ app.get('/restaurant/', function (request, response) {
 app.get('/reviews/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     let filterReviews = reviews;
-    console.log(filterReviews);
     if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
         filterReviews = reviews.filter(review => review.restaurantID === request.query.restaurantID);
     }
     if (request.query.rating !== undefined) {
         filterReviews = filterReviews.filter(review => review.rating >= parseInt(request.query.rating));
     }
-    console.log(filterReviews);
     response.json(filterReviews.map((review) => ({ ID: review.ID, title: review.title, name: review.name, rating: review.rating })));
 });
 
@@ -79,7 +78,6 @@ app.get('/review/', function (request, response) {
 app.get('/events/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     let filterEvents = events;
-    // console.log(filterReviews);
     if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
         filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
     }
@@ -90,7 +88,6 @@ app.get('/events/', function (request, response) {
     if (request.query.city !== undefined && request.query.city !== '') {
         filterEvents = filterEvents.filter(event => event.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
     }
-    // console.log(filterReviews);
     response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name })));
 });
 
@@ -112,17 +109,20 @@ app.get('/event/', function (request, response) {
 });
 
 app.post('/restaurants/add/', function (request, response) {
-    console.log(request);
     //
 });
 
-app.post('review/add/', function (request, response) {
-        //
+app.post('/review/add', function (request, response) {
+    const lastReview = reviews[reviews.length - 1];
+    const id = lastReview ? (parseInt(lastReview.ID) + 1).toString() : '1';
+    reviews.push({ title: request.body.title, name: request.body.name, rating: parseInt(request.body.rating), description: request.body.description, restaurantID: request.body.restaurantID, ID: id });
+    response.sendStatus(201);
+    console.log(reviews);
 });
 
 app.get('/images/', function (request, response) {
     try {
-        response.sendFile(path.join(__dirname, 'images', request.query.ID, 'jpeg'));
+        response.sendFile(path.join(__dirname, 'images', request.query.ID + '.jpeg'));
     } catch (e) {
         response.setHeader('content-Type', 'image/jpeg');
         response.sendStatus(404);
@@ -137,6 +137,7 @@ app.use(function (request, response) {
         response.sendStatus(500);
     }
 });
+
 
 app.listen(8080);
 console.log('server running on port 8080');

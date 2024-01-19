@@ -1,4 +1,5 @@
 let searchType = 1; // 1 for restaurants 0 for events
+let currentRestaurantID;
 const days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 
 const restaurantButton = document.getElementById('restaurant');
@@ -59,6 +60,7 @@ async function loadRestaurant(event) {
         if (document.getElementById('searchArea').style.display === 'block') {
             return;
         }
+        currentRestaurantID = info['ID'];
         html = '';
         document.getElementById('nameTitle').innerHTML = info['name'];
         for (let i = 0; i < 7; i++) {
@@ -264,22 +266,18 @@ const reviewForm = document.getElementById('review-form');
 reviewForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(reviewForm);
-    const jsonData = {
+    const jsonData = JSON.stringify({
         title: document.getElementById('reviewTitle').value,
         name: document.getElementById('nameReview').value,
         description: document.getElementById('descReview').value,
-        rating: parseInt(formData.get('rating'))
-    };
-    // const response = await fetch("http://127.0.0.1:8080/fact/new2", {
-    //     method: "POST",
-    //     // need to set headers to make sure the server knows to invoke the JSON parser
-    //     headers: {
-    //     "Content-Type": "application/json"
-    //     },
-    //     body: dataJson
-    // });
-    // setupTagButtons();
-    // // deal with the response?
-    // // TODO
-
+        rating: parseInt(formData.get('rating')),
+        restaurantID: currentRestaurantID
+    });
+    const response = await fetch("http://127.0.0.1:8080/review/add", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json"
+        },
+        body: jsonData
+    });
 });
