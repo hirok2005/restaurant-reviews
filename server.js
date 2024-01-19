@@ -10,7 +10,6 @@ const restaurants = data.restaurants;
 const reviews = data.reviews;
 const events = data.events;
 const restaurantSearch = new Fuse(restaurants, { keys: ['name', 'style'] });
-const eventSearch = new Fuse(events, { keys: ['eventID'] });
 
 app.use(express.static('client'));
 
@@ -57,7 +56,7 @@ app.get('/reviews/', function (request, response) {
         filterReviews = filterReviews.filter(review => review.rating >= parseInt(request.query.rating));
     }
     console.log(filterReviews);
-    response.json(filterReviews.map((review) => ({ ID: review.ID, name: review.name })));
+    response.json(filterReviews.map((review) => ({ ID: review.ID, title: review.title, name: review.name, rating: review.rating })));
 });
 
 app.get('/review/', function (request, response) {
@@ -81,8 +80,12 @@ app.get('/events/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     let filterEvents = events;
     // console.log(filterReviews);
-    if (request.query.eventID !== undefined && request.query.eventID !== '') {
-        filterEvents = eventSearch.search(request.query.eventID).map(item => item.item);
+    if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
+        filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
+    }
+    if (request.query.style !== undefined && request.query.style !== '') {
+        // todo style!!!
+        filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
     }
     if (request.query.city !== undefined && request.query.city !== '') {
         filterEvents = filterEvents.filter(event => event.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
@@ -108,9 +111,13 @@ app.get('/event/', function (request, response) {
     response.sendStatus(404);
 });
 
-app.post('/restaurants/add', function (request, response) {
+app.post('/restaurants/add/', function (request, response) {
     console.log(request);
     //
+});
+
+app.post('review/add/', function (request, response) {
+        //
 });
 
 app.get('/images/', function (request, response) {

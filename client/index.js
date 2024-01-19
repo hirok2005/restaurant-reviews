@@ -32,28 +32,30 @@ async function loadSearchDiv() {
         event.preventDefault();
         const rating = document.querySelector('input[name="rating"]:checked').value;
         const name = document.getElementById('name').value;
-        const city = document.getElementById('city').value;
+        const city = document.getElementById('citySearch').value;
         await search(rating, city, name);
     });
 }
 
 async function loadRestaurant(event) {
-    let review;
     event.preventDefault();
     document.getElementById('searchArea').style.display = 'none';
     document.getElementById('spinner').style.display = 'block';
     tableBody = document.getElementById('tableBody');
     const content = document.getElementById('info');
     let html = '';
+    let review;
     try {
         const response = await fetch('http://127.0.0.1:8080/restaurant/?ID=' + event.target.id);
         const imgResponse = await fetch('http://127.0.0.1:8080/images/?ID=' + event.target.id);
         const reviewResponse = await fetch('http://127.0.0.1:8080/reviews/?restaurantID=' + event.target.id);
+        const eventResponse =  await fetch('http://127.0.0.1:8080/events/?restaurantID=' + event.target.id);
         if (!isOk(response)) {
             return;
         }
         const info = await response.json();
         const reviews = await reviewResponse.json();
+        const events = await eventResponse.json();
         if (document.getElementById('searchArea').style.display === 'block') {
             return;
         }
@@ -81,23 +83,24 @@ async function loadRestaurant(event) {
         drawStars('starsInfo', info['rating']);
 
         html = '';
-        console.log(reviews);
         const ratings = [];
         for (let i = 0; i < reviews.length; i++) {
-            review = await fetch('http://127.0.0.1:8080/review/?ID='+reviews[i]['ID']);
-            review = await review.json();
+            review = reviews[i];
             ratings.push(review['rating'])
-            console.log(review)
-            html += `<h4>${review['title']}</h4>
+            html += `<div class="border px-2 pb-2"><h4>${review['title']}</h4>
             <div id="stars${i}"></div>
             <h5>${review['name']}</h5>
-            <p>${review['description']}</p>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showReview(event)" id="${review['ID']}">Expand</a>
+            </div>
             `;
         }
         document.getElementById('reviews').innerHTML = html;
         for (let i = 0; i < reviews.length; i++) {
-            console.log(i);
             drawStars('stars'+i.toString(), ratings[i]);
+        }
+
+        for (let i = 0; i < events.length; i++) {
+
         }
     
         document.getElementById('spinner').style.display = 'none';
@@ -137,7 +140,7 @@ async function search(rating = '', city = '', name = '') {
             html += `<div><div class="card col mb-3">
                         <img src="..." class="card-img-top" alt="...">
                         <div class="card-body">
-                        <h5 class="card-title text-reset text-decoration-none text-nowrap" href=#>${title}</h5>
+                        <h5 class="card-title text-nowrap" href=# style="text-align: center;">${title}</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                         <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? 'loadRestaurant(event)' : 'loadEvent(event)'} id="${data[i].ID}">Info Page</a>
                         </div>
@@ -149,6 +152,29 @@ async function search(rating = '', city = '', name = '') {
         content.innerHTML = `<div class="alert alert-danger" role="alert">
         Something wrong happened please try again ${e}</div>`;
     }
+}
+
+async function showReview(event) {
+    event.preventDefault();
+    try{
+        console.log(event)
+        response = await fetch('http://127.0.0.1:8080/review/?ID=' + event.target.id);
+        if (!isOk(response)) {
+            return;
+        }
+        const review = await response.json();
+        document.getElementById('reviewBody').innerHTML = `<h4>${review['title']}</h4>
+                                                            <div id="reviewBodyStars"></div>
+                                                            <h5>${review['name']}</h5>
+                                                            <p>${review['description']}</p>
+                                                            `;
+        drawStars('reviewBodyStars', review["rating"]);
+        var myModal = new bootstrap.Modal(document.getElementById('review'), {})
+        myModal.show()
+
+    } catch (e) {
+        // to do
+    }    
 }
 
 function changeType(type) {
@@ -183,7 +209,7 @@ function searchPlaceHolder() {
         html += `<div><div class="card mb-3" aria-hidden="true">
         <img src="..." class="card-img-top" alt="...">
         <div class="card-body">
-          <h5 class="card-title placeholder-glow">
+          <h5 class="card-title placeholder-glow" style="text-align: center;">
             <span class="placeholder col-6"></span>
           </h5>
           <p class="card-text placeholder-glow">
@@ -218,9 +244,8 @@ function drawStars(id, rating) {
             <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.56.56 0 0 0-.163-.505L1.71 6.745l4.052-.576a.53.53 0 0 0 .393-.288L8 2.223l1.847 3.658a.53.53 0 0 0 .393.288l4.052.575-2.906 2.77a.56.56 0 0 0-.163.506l.694 3.957-3.686-1.894a.5.5 0 0 0-.461 0z"/>
             </svg>`
         }
-        console.log(id, rating);
         document.getElementById(id).innerHTML = html;
-        console.log('here');} catch (e){
+        } catch (e){
             console.log(e)
         }
 }
@@ -232,4 +257,29 @@ restaurantButton.addEventListener('click', async function (event) {
 
 document.addEventListener('DOMContentLoaded', async function (event) {
     loadSearchDiv();
+});
+
+const reviewForm = document.getElementById('review-form');
+
+reviewForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(reviewForm);
+    const jsonData = {
+        title: document.getElementById('reviewTitle').value,
+        name: document.getElementById('nameReview').value,
+        description: document.getElementById('descReview').value,
+        rating: parseInt(formData.get('rating'))
+    };
+    // const response = await fetch("http://127.0.0.1:8080/fact/new2", {
+    //     method: "POST",
+    //     // need to set headers to make sure the server knows to invoke the JSON parser
+    //     headers: {
+    //     "Content-Type": "application/json"
+    //     },
+    //     body: dataJson
+    // });
+    // setupTagButtons();
+    // // deal with the response?
+    // // TODO
+
 });
