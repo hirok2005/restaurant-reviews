@@ -9,8 +9,18 @@ function isOk(response) {
     if (response.ok) {
         return true;
     }
+    console.log("uhoh")
     document.getElementById('main-content').innerHTML = `<h1>${response.status} - ${response.statusText}</h1>`;
     return false;
+}
+
+
+function handleError(e) {
+    if (document.getElementById('errorModal').classList.contains('show')) {
+        return;
+    }
+    document.getElementById('errorBody').innerHTML = e
+    new bootstrap.Modal(document.getElementById('errorModal'), {}).show()
 }
 
 function isOpen(openingTimes) {
@@ -20,6 +30,7 @@ function isOpen(openingTimes) {
     if (!times[0]) {
         return false;
     }
+    console.log((times[0] <= currTime && currTime < times[1]))
     return (times[0] <= currTime && currTime < times[1]);
 }
 
@@ -67,8 +78,11 @@ async function loadRestaurant(ID) {
         }
         tableBody.innerHTML = html;
         document.getElementById('description').innerHTML = info['description'];
+        console.log(info)
         if (isOpen(info['opening_times'])) {
-            document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() - 1][1];
+            
+            console.log("here")
+            document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() > 0 ? new Date().getDay() - 1 : 6][1];
             document.getElementById('currentlyOpen').style.color = 'green';
         } else {
             document.getElementById('currentlyOpen').innerHTML = 'Closed';
@@ -112,8 +126,7 @@ async function loadRestaurant(ID) {
         document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
-        content.innerHTML = `<div class="alert alert-danger" role="alert">
-        Something wrong happened please try again ${e}</div>`;
+        handleError(e)
     }
 }
 
@@ -124,7 +137,7 @@ async function search(rating = '', city = '', name = '') {
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
         if (searchType === 1) {
-            response = await fetch('/restaurants?' + query);
+            response = await fetch('/restaurants?' + query, { signal: AbortSignal.timeout(5000) });
         } else {
             response = await fetch('/events?' + query);
         }
@@ -155,13 +168,11 @@ async function search(rating = '', city = '', name = '') {
         }
         results.innerHTML = html;
     } catch (e) {
-        content.innerHTML = `<div class="alert alert-danger" role="alert">
-        Something wrong happened please try again ${e}</div>`;
+        handleError(e)
     }
 }
 
 async function showInfoModal(ID, type) {
-    event.preventDefault();
     try{
         response = await fetch(`/${type}/?ID=` + ID);
         if (!isOk(response)) {
@@ -175,11 +186,10 @@ async function showInfoModal(ID, type) {
                                                             <p>${info['description']}</p>
                                                             <p>${info['start']} ${info['end']}</p>`;
         drawStars('reviewBodyStars', info["rating"]);
-        var myModal = new bootstrap.Modal(document.getElementById('infoModal'), {})
-        myModal.show()
+        new bootstrap.Modal(document.getElementById('infoModal'), {}).show()
 
     } catch (e) {
-        // to do
+        handleError(e)
     }    
 }
 
@@ -249,7 +259,7 @@ function drawStars(id, rating) {
         }
         document.getElementById(id).innerHTML = html;
         } catch (e){
-            console.log(e)
+            handleError(e)
         }
 }
 
