@@ -28,39 +28,34 @@ async function loadSearchDiv() {
     document.getElementById('searchArea').style.display = 'block';
     document.getElementById('spinner').style.display = 'none';
     await search('0');
-    const submitForm = document.getElementById('search-form');
-    submitForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const rating = document.querySelector('input[name="rating"]:checked').value;
-        const name = document.getElementById('name').value;
-        const city = document.getElementById('citySearch').value;
-        await search(rating, city, name);
-    });
 }
 
-async function loadRestaurant(event) {
-    event.preventDefault();
+async function loadRestaurant(ID) {
+    currentRestaurantID = ID.toString();
     document.getElementById('searchArea').style.display = 'none';
     document.getElementById('spinner').style.display = 'block';
     tableBody = document.getElementById('tableBody');
     const content = document.getElementById('info');
     let html = '';
     let review;
+    let event;
     try {
-        const response = await fetch('http://127.0.0.1:8080/restaurant/?ID=' + event.target.id);
-        const imgResponse = await fetch('http://127.0.0.1:8080/images/?ID=' + event.target.id);
-        const reviewResponse = await fetch('http://127.0.0.1:8080/reviews/?restaurantID=' + event.target.id);
-        const eventResponse =  await fetch('http://127.0.0.1:8080/events/?restaurantID=' + event.target.id);
+        const response = await fetch('/restaurant/?ID=' + ID);
+        // const imgResponse = await fetch('/images/?ID=' + ID);
+        const reviewResponse = await fetch('/reviews/?restaurantID=' + ID);
+        const eventResponse =  await fetch('/events/?upcoming=T&restaurantID=' + ID);
         if (!isOk(response)) {
             return;
         }
         const info = await response.json();
         const reviews = await reviewResponse.json();
         const events = await eventResponse.json();
-        if (document.getElementById('searchArea').style.display === 'block') {
+        console.log(info["ID"] !== currentRestaurantID)
+        console.log(info["ID"], currentRestaurantID)
+        if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentRestaurantID) {
+            document.getElementById('spinner').style.display = 'none';
             return;
         }
-        currentRestaurantID = info['ID'];
         html = '';
         document.getElementById('nameTitle').innerHTML = info['name'];
         for (let i = 0; i < 7; i++) {
@@ -81,9 +76,9 @@ async function loadRestaurant(event) {
         }
         document.getElementById('addressInfo').innerHTML = `${info['address'].join(', ')}`;
         document.getElementById('phoneNumberInfo').innerHTML = info['phone_number'];
-        document.getElementById('ratingInfo').innerHTML = `${info['rating']} (${reviews.length} reviews)`;
+        document.getElementById('ratingInfo').innerHTML = `${info['rating'].toFixed(1)} (${reviews.length} reviews)`;
         drawStars('starsInfo', info['rating']);
-
+        
         html = '';
         const ratings = [];
         for (let i = 0; i < reviews.length; i++) {
@@ -92,7 +87,7 @@ async function loadRestaurant(event) {
             html += `<div class="border px-2 pb-2"><h4>${review['title']}</h4>
             <div id="stars${i}"></div>
             <h5>${review['name']}</h5>
-            <a href="#" class="btn btn-primary btn-sm" onclick="showReview(event)" id="${review['ID']}">Expand</a>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${review['ID']}, 'review')" id="${review['ID']}">Expand</a>
             </div>
             `;
         }
@@ -100,13 +95,22 @@ async function loadRestaurant(event) {
         for (let i = 0; i < reviews.length; i++) {
             drawStars('stars'+i.toString(), ratings[i]);
         }
-
-        for (let i = 0; i < events.length; i++) {
-
-        }
     
+        html = '';
+        for (let i = 0; i < events.length; i++) {
+            event = events[i];
+            const time = event['start'].replace('T', ' ');
+            html += `<div class="border px-2 pb-2"><h4>${event['name']}</h4>
+            <p>${time.substring(0, time.length - 3)}</p>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${event['ID']}, 'event')" id="${event['ID']}">Expand</a>
+            </div>
+            `;
+        }
+        document.getElementById('events').innerHTML = html;
+
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('info').style.display = 'block';
+        document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
         content.innerHTML = `<div class="alert alert-danger" role="alert">
         Something wrong happened please try again ${e}</div>`;
@@ -120,9 +124,9 @@ async function search(rating = '', city = '', name = '') {
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
         if (searchType === 1) {
-            response = await fetch('http://127.0.0.1:8080/restaurants?' + query);
+            response = await fetch('/restaurants?' + query);
         } else {
-            response = await fetch('http://127.0.0.1:8080/events?' + query);
+            response = await fetch('/events?' + query);
         }
         if (!isOk(response)) {
             return;
@@ -135,8 +139,8 @@ async function search(rating = '', city = '', name = '') {
         }
         let html = '';
         for (let i = 0; i < data.length; i++) {
-            let title = data[i].name.substring(0, 17);
-            if (data[i].name.length > 17) {
+            let title = data[i]["name"].substring(0, 17);
+            if (data[i]["name"].length > 17) {
                 title += '...';
             }
             html += `<div><div class="card col mb-3">
@@ -144,7 +148,7 @@ async function search(rating = '', city = '', name = '') {
                         <div class="card-body">
                         <h5 class="card-title text-nowrap" href=# style="text-align: center;">${title}</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? 'loadRestaurant(event)' : 'loadEvent(event)'} id="${data[i].ID}">Info Page</a>
+                        <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? `loadRestaurant(${data[i].ID})` : `loadEvent(${data[i].ID})`} id="${data[i].ID}">Info Page</a>
                         </div>
                     </div>
                     </div>`;
@@ -156,22 +160,22 @@ async function search(rating = '', city = '', name = '') {
     }
 }
 
-async function showReview(event) {
+async function showInfoModal(ID, type) {
     event.preventDefault();
     try{
-        console.log(event)
-        response = await fetch('http://127.0.0.1:8080/review/?ID=' + event.target.id);
+        response = await fetch(`/${type}/?ID=` + ID);
         if (!isOk(response)) {
             return;
         }
-        const review = await response.json();
-        document.getElementById('reviewBody').innerHTML = `<h4>${review['title']}</h4>
-                                                            <div id="reviewBodyStars"></div>
-                                                            <h5>${review['name']}</h5>
-                                                            <p>${review['description']}</p>
-                                                            `;
-        drawStars('reviewBodyStars', review["rating"]);
-        var myModal = new bootstrap.Modal(document.getElementById('review'), {})
+        const info = await response.json();
+        document.getElementById('infoTitleModal').innerHTML = type === 'review' ? info['title'] : info['name'];
+        document.getElementById('infoBody').innerHTML =  type === 'review' ? `<div id="reviewBodyStars"></div>
+                                                            <h5>${info['name']}</h5>
+                                                            <p>${info['description']}</p>`: `
+                                                            <p>${info['description']}</p>
+                                                            <p>${info['start']} ${info['end']}</p>`;
+        drawStars('reviewBodyStars', info["rating"]);
+        var myModal = new bootstrap.Modal(document.getElementById('infoModal'), {})
         myModal.show()
 
     } catch (e) {
@@ -185,15 +189,12 @@ function changeType(type) {
     if (type === 1) {
         document.getElementById('searchTypeName').innerHTML = 'Restaurants';
         document.getElementById('ratings').removeAttribute('hidden');
-        document.getElementById('collapseLabel').innerHTML = 'Add a restaurant';
-        document.getElementById('nameLabel').innerHTML = 'Restaurant Name';
-        document.getElementById('collapseLabel')
+        document.getElementById('collapseLabel').removeAttribute('hidden');
         return;
     }
     document.getElementById('searchTypeName').innerHTML = 'Events';
     document.getElementById('ratings').setAttribute('hidden', 'hidden');
-    document.getElementById('collapseLabel').innerHTML = 'Add an event';
-    document.getElementById('nameLabel').innerHTML = 'Add an event';
+    document.getElementById('collapseLabel').setAttribute('hidden', 'hidden')
 }
 
 function changeColourMode() {
@@ -252,6 +253,15 @@ function drawStars(id, rating) {
         }
 }
 
+const submitForm = document.getElementById('search-form');
+submitForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    const rating = document.querySelector('input[name="rating"]:checked').value;
+    const name = document.getElementById('name').value;
+    const city = document.getElementById('citySearch').value;
+    await search(rating, city, name);
+});
+
 restaurantButton.addEventListener('click', async function (event) {
     event.preventDefault();
     loadSearchDiv();
@@ -273,11 +283,16 @@ reviewForm.addEventListener("submit", async (event) => {
         rating: parseInt(formData.get('rating')),
         restaurantID: currentRestaurantID
     });
-    const response = await fetch("http://127.0.0.1:8080/review/add", {
+    const response = await fetch("/review/add", {
         method: "POST",
         headers: {
         "Content-Type": "application/json"
         },
         body: jsonData
     });
+    event.target.reset()
+    scroll(0,0);
+    new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+
+    loadRestaurant(currentRestaurantID);
 });

@@ -338,6 +338,10 @@
     "events": [
         {
             "name": "50% Fridays",
+            "description": "Enjoy up to 50% off on selected items this Friday for you and your family to enjoy!",
+            "start": "2025-02-14T12:30:00",
+            "end": "2024-02-14T12:30:00",
+            "restaurantID": "1",
             "ID": "1"
         }
     ]

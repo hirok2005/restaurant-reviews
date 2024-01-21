@@ -184,11 +184,11 @@
     <div class="row mx-auto">
       <div class="col-md-6 w-25 mx-auto">
         <h2>Reviews</h2>
-        <div class="overflow-auto" id="reviews"></div>
+        <div class="overflow-auto border" id="reviews"></div>
       </div>
       <div class="col-md-6 w-25 mx-auto">
         <h2>Events</h2>
-        <div class="overflow-auto" id="events"></div>
+        <div class="overflow-auto border" id="events"></div>
       </div>
     </div>
     <div class="container container-sm container-md-none w-100">
@@ -203,15 +203,15 @@
           <form id="review-form">
             <div class="mb-3">
               <label for="reviewTitle" class="form-label" id="reviewTitleLabel">Title</label>
-              <input type="text" class="form-control" id="reviewTitle" required>
+              <input type="text" class="form-control" id="reviewTitle" minlength="3" maxlength="30" required>
             </div>
             <div class="mb-3">
               <label for="nameReview" class="form-label">Name</label>
-              <input class="form-control" id="nameReview" required>
+              <input class="form-control" id="nameReview" minlength="3" maxlength="30" required>
             </div>
             <div class="mb-3">
               <label for="descReview" class="form-label">Description</label>
-              <textarea class="form-control" id="descReview" minlength="10" required></textarea>
+              <textarea class="form-control" id="descReview" minlength="10" maxlength="250" required></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Rating</label>
@@ -243,14 +243,14 @@
       </div>
     </div>
 
-    <div class="modal fade" id="review" tabindex="-1" aria-labelledby="reviewLabelModal" aria-hidden="true">
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoLabelModal" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="reviewTitleModal"></h1>
+            <h1 class="modal-title fs-5" id="infoTitleModal"></h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body" id="reviewBody"></div>
+          <div class="modal-body" id="infoBody"></div>
         </div>
       </div>
     </div>

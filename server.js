@@ -26,9 +26,10 @@ app.get('/restaurants/', function (request, response) {
     if (request.query.rating !== undefined) {
         filterRestaurants = filterRestaurants.filter(restaurant => restaurant.rating >= parseInt(request.query.rating));
     }
-    response.json(filterRestaurants.map((restaurant) => ({ ID: restaurant.ID, name: restaurant.name })));
+    response.json(filterRestaurants.map((restaurant) => ({ ID: restaurant.ID, name: restaurant.name, description: restaurant.description })));
 });
 
+// todo: return related review ids too
 app.get('/restaurant/', function (request, response) {
     // return all data of restaurant if no other query other than ID
     response.setHeader('Content-Type', 'application/json');
@@ -79,16 +80,21 @@ app.get('/events/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     let filterEvents = events;
     if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
-        filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
+        filterEvents = events.filter(event => event.restaurantID === request.query.restaurantID);
     }
-    if (request.query.style !== undefined && request.query.style !== '') {
-        // todo style!!!
-        filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
-    }
+    // if (request.query.style !== undefined && request.query.style !== '') {
+    //     // todo style!!!
+    //     filterEvents = reviews.filter(event => event.restaurantID === request.query.restaurantID);
+    // }
     if (request.query.city !== undefined && request.query.city !== '') {
         filterEvents = filterEvents.filter(event => event.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
     }
-    response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name })));
+    if (request.query.upcoming !== undefined && request.query.upcoming === 'T') {
+        let currDate = new Date().toISOString();
+        currDate = currDate.substring(0, currDate.length - 5);
+        filterEvents = filterEvents.filter(event => event.start >= currDate);
+    }
+    response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name, start: event.start, description: event.description })));
 });
 
 app.get('/event/', function (request, response) {
@@ -113,31 +119,32 @@ app.post('/restaurants/add/', function (request, response) {
 });
 
 app.post('/review/add', function (request, response) {
+    response.setHeader('Content-Type', 'application/json');
     const lastReview = reviews[reviews.length - 1];
     const id = lastReview ? (parseInt(lastReview.ID) + 1).toString() : '1';
-    reviews.push({ title: request.body.title, name: request.body.name, rating: parseInt(request.body.rating), description: request.body.description, restaurantID: request.body.restaurantID, ID: id });
-    response.sendStatus(201);
-    console.log(reviews);
+    const review = { title: request.body.title, name: request.body.name, rating: parseInt(request.body.rating), description: request.body.description, restaurantID: request.body.restaurantID, ID: id };
+    reviews.push(review);
+    response.json(review);
+    for (let i = 0; i < restaurants.length; i++) {
+        if (restaurants[i].ID === request.body.restaurantID) {
+            const numOfReviews = reviews.filter(review => review.restaurantID === request.body.restaurantID).length;
+            restaurants[i].rating = (restaurants[i].rating * numOfReviews + parseInt(request.body.rating)) / (numOfReviews + 1);
+        }
+    }
 });
 
 app.get('/images/', function (request, response) {
+    response.setHeader('content-Type', 'image/jpeg');
     try {
         response.sendFile(path.join(__dirname, 'images', request.query.ID + '.jpeg'));
     } catch (e) {
-        response.setHeader('content-Type', 'image/jpeg');
         response.sendStatus(404);
     }
 });
 
 app.use(function (request, response) {
-    if (request.accepts('html')) {
-        // TODO: make a nice 404 page
-        response.status(500).send('<h1>505 Internal</h1>');
-    } else {
-        response.sendStatus(500);
-    }
+    response.sendStatus(500);
 });
 
-
-app.listen(8080);
+app.listen(8090);
 console.log('server running on port 8080');
