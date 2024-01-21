@@ -1,5 +1,7 @@
 let searchType = 1; // 1 for restaurants 0 for events
-let currentRestaurantID;
+let currentRestaurantID; // these make sure for slow connections info from previous request is not shown while waiting for new request
+let currentEventID;
+const currDate = new Date().toISOString();
 const days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 
 const restaurantButton = document.getElementById('restaurant');
@@ -9,13 +11,12 @@ function isOk(response) {
     if (response.ok) {
         return true;
     }
-    console.log("uhoh")
-    document.getElementById('main-content').innerHTML = `<h1>${response.status} - ${response.statusText}</h1>`;
+    handleError("Something went wrong please try again")
     return false;
 }
 
-
 function handleError(e) {
+    console.error(e)
     if (document.getElementById('errorModal').classList.contains('show')) {
         return;
     }
@@ -54,7 +55,7 @@ async function loadRestaurant(ID) {
         const response = await fetch('/restaurant/?ID=' + ID);
         // const imgResponse = await fetch('/images/?ID=' + ID);
         const reviewResponse = await fetch('/reviews/?restaurantID=' + ID);
-        const eventResponse =  await fetch('/events/?upcoming=T&restaurantID=' + ID);
+        const eventResponse = await fetch('/events/?upcoming=T&restaurantID=' + ID);
         if (!isOk(response)) {
             return;
         }
@@ -80,7 +81,7 @@ async function loadRestaurant(ID) {
         document.getElementById('description').innerHTML = info['description'];
         console.log(info)
         if (isOpen(info['opening_times'])) {
-            
+
             console.log("here")
             document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() > 0 ? new Date().getDay() - 1 : 6][1];
             document.getElementById('currentlyOpen').style.color = 'green';
@@ -92,7 +93,7 @@ async function loadRestaurant(ID) {
         document.getElementById('phoneNumberInfo').innerHTML = info['phone_number'];
         document.getElementById('ratingInfo').innerHTML = `${info['rating'].toFixed(1)} (${reviews.length} reviews)`;
         drawStars('starsInfo', info['rating']);
-        
+
         html = '';
         const ratings = [];
         for (let i = 0; i < reviews.length; i++) {
@@ -107,15 +108,14 @@ async function loadRestaurant(ID) {
         }
         document.getElementById('reviews').innerHTML = html;
         for (let i = 0; i < reviews.length; i++) {
-            drawStars('stars'+i.toString(), ratings[i]);
+            drawStars('stars' + i.toString(), ratings[i]);
         }
-    
+
         html = '';
         for (let i = 0; i < events.length; i++) {
             event = events[i];
-            const time = event['start'].replace('T', ' ');
             html += `<div class="border px-2 pb-2"><h4>${event['name']}</h4>
-            <p>${time.substring(0, time.length - 3)}</p>
+            <p>${event['start'].replace('T', ' ')}</p>
             <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${event['ID']}, 'event')" id="${event['ID']}">Expand</a>
             </div>
             `;
@@ -125,6 +125,96 @@ async function loadRestaurant(ID) {
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
+    } catch (e) {
+        handleError(e)
+    }
+}
+
+async function loadEvent(ID) {
+
+    currentEventID = ID.toString();
+    document.getElementById('searchArea').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
+    tableBody = document.getElementById('tableBody');
+    const content = document.getElementById('info');
+    let html = '';
+    let review;
+    let event;
+    try {
+        const response = await fetch('/restaurant/?ID=' + ID);
+        // const imgResponse = await fetch('/images/?ID=' + ID);
+        const reviewResponse = await fetch('/reviews/?restaurantID=' + ID);
+        const eventResponse = await fetch('/events/?upcoming=T&restaurantID=' + ID);
+        if (!isOk(response)) {
+            return;
+        }
+        const info = await response.json();
+        const reviews = await reviewResponse.json();
+        const events = await eventResponse.json();
+        console.log(info["ID"] !== currentRestaurantID)
+        console.log(info["ID"], currentRestaurantID)
+        if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentRestaurantID) {
+            document.getElementById('spinner').style.display = 'none';
+            return;
+        }
+        html = '';
+        document.getElementById('nameTitle').innerHTML = info['name'];
+        for (let i = 0; i < 7; i++) {
+            html += `<tr>
+            <th scope="row">${days[i]}</th>
+            <td>${info['opening_times'][i][0] ? info['opening_times'][i][0] : 'closed'}</td>
+            <td>${info['opening_times'][i][0] ? info['opening_times'][i][1] : 'closed'}</td>
+            </tr>`
+        }
+        tableBody.innerHTML = html;
+        document.getElementById('description').innerHTML = info['description'];
+        console.log(info)
+        if (isOpen(info['opening_times'])) {
+
+            console.log("here")
+            document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() > 0 ? new Date().getDay() - 1 : 6][1];
+            document.getElementById('currentlyOpen').style.color = 'green';
+        } else {
+            document.getElementById('currentlyOpen').innerHTML = 'Closed';
+            document.getElementById('currentlyOpen').style.color = 'red';
+        }
+        document.getElementById('addressInfo').innerHTML = `${info['address'].join(', ')}`;
+        document.getElementById('phoneNumberInfo').innerHTML = info['phone_number'];
+        document.getElementById('ratingInfo').innerHTML = `${info['rating'].toFixed(1)} (${reviews.length} reviews)`;
+        drawStars('starsInfo', info['rating']);
+
+        html = '';
+        const ratings = [];
+        for (let i = 0; i < reviews.length; i++) {
+            review = reviews[i];
+            ratings.push(review['rating'])
+            html += `<div class="border px-2 pb-2"><h4>${review['title']}</h4>
+            <div id="stars${i}"></div>
+            <h5>${review['name']}</h5>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${review['ID']}, 'review')" id="${review['ID']}">Expand</a>
+            </div>
+            `;
+        }
+        document.getElementById('reviews').innerHTML = html;
+        for (let i = 0; i < reviews.length; i++) {
+            drawStars('stars' + i.toString(), ratings[i]);
+        }
+
+        html = '';
+        for (let i = 0; i < events.length; i++) {
+            let a = events[i];
+            html += `<div class="border px-2 pb-2"><h4>${a['name']}</h4>
+            <p>${a['start']}</p>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${a['ID']}, 'event')" id="${a['ID']}">Expand</a>
+            </div>
+            `;
+        }
+        document.getElementById('events').innerHTML = html;
+        
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('info').style.display = 'block';
+        document.getElementById('reviews').scroll(0, 0);
+        console.log('hmmmm');
     } catch (e) {
         handleError(e)
     }
@@ -173,24 +263,27 @@ async function search(rating = '', city = '', name = '') {
 }
 
 async function showInfoModal(ID, type) {
-    try{
+    try {
         response = await fetch(`/${type}/?ID=` + ID);
         if (!isOk(response)) {
             return;
         }
         const info = await response.json();
         document.getElementById('infoTitleModal').innerHTML = type === 'review' ? info['title'] : info['name'];
-        document.getElementById('infoBody').innerHTML =  type === 'review' ? `<div id="reviewBodyStars"></div>
+        document.getElementById('infoBody').innerHTML = type === 'review' ? `<div id="reviewBodyStars"></div>
                                                             <h5>${info['name']}</h5>
-                                                            <p>${info['description']}</p>`: `
+                                                            <p>${info['description']}</p>` : `
                                                             <p>${info['description']}</p>
                                                             <p>${info['start']} ${info['end']}</p>`;
-        drawStars('reviewBodyStars', info["rating"]);
+
+        if (type === 'review') {
+            drawStars('reviewBodyStars', info["rating"]);
+        }
         new bootstrap.Modal(document.getElementById('infoModal'), {}).show()
 
     } catch (e) {
         handleError(e)
-    }    
+    }
 }
 
 function changeType(type) {
@@ -240,8 +333,8 @@ function searchPlaceHolder() {
 }
 
 function drawStars(id, rating) {
-    try
-    {    let html = '';
+    try {
+        let html = '';
         for (let i = 0; i < Math.floor(rating); i++) {
             html += `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
             <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
@@ -258,10 +351,12 @@ function drawStars(id, rating) {
             </svg>`
         }
         document.getElementById(id).innerHTML = html;
-        } catch (e){
-            handleError(e)
-        }
+    } catch (e) {
+        handleError(e)
+    }
 }
+
+document.getElementById('eventStart').min = currDate.substring(0, currDate.length - 8);
 
 const submitForm = document.getElementById('search-form');
 submitForm.addEventListener('submit', async function (event) {
@@ -285,24 +380,41 @@ const reviewForm = document.getElementById('review-form');
 
 reviewForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const formData = new FormData(reviewForm);
-    const jsonData = JSON.stringify({
-        title: document.getElementById('reviewTitle').value,
-        name: document.getElementById('nameReview').value,
-        description: document.getElementById('descReview').value,
-        rating: parseInt(formData.get('rating')),
-        restaurantID: currentRestaurantID
-    });
+    let formData = new FormData(reviewForm);
+    formData.append("restaurantID", currentRestaurantID);
+    const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
+    console.log(jsonData);
     const response = await fetch("/review/add", {
         method: "POST",
         headers: {
-        "Content-Type": "application/json"
+            "Content-Type": "application/json"
         },
         body: jsonData
     });
     event.target.reset()
-    scroll(0,0);
+    scroll(0, 0);
     new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+
+    loadRestaurant(currentRestaurantID);
+});
+
+const eventForm = document.getElementById('event-form');
+
+eventForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(eventForm);
+    formData.append("restaurantID", currentRestaurantID);
+    const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
+    const response = await fetch("/event/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: jsonData
+    });
+    event.target.reset()
+    scroll(0, 0);
+    new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
 
     loadRestaurant(currentRestaurantID);
 });

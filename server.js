@@ -91,9 +91,10 @@ app.get('/events/', function (request, response) {
     }
     if (request.query.upcoming !== undefined && request.query.upcoming === 'T') {
         let currDate = new Date().toISOString();
-        currDate = currDate.substring(0, currDate.length - 5);
+        currDate = currDate.substring(0, currDate.length - 8);
         filterEvents = filterEvents.filter(event => event.start >= currDate);
     }
+    console.log(filterEvents.map((event) => ({ ID: event.ID, name: event.name, start: event.start, description: event.description })));
     response.json(filterEvents.map((event) => ({ ID: event.ID, name: event.name, start: event.start, description: event.description })));
 });
 
@@ -114,12 +115,13 @@ app.get('/event/', function (request, response) {
     response.sendStatus(404);
 });
 
-app.post('/restaurants/add/', function (request, response) {
+app.post('/restaurant/add/', function (request, response) {
     //
 });
 
 app.post('/review/add', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
+    console.log(request.body);
     const lastReview = reviews[reviews.length - 1];
     const id = lastReview ? (parseInt(lastReview.ID) + 1).toString() : '1';
     const review = { title: request.body.title, name: request.body.name, rating: parseInt(request.body.rating), description: request.body.description, restaurantID: request.body.restaurantID, ID: id };
@@ -131,6 +133,16 @@ app.post('/review/add', function (request, response) {
             restaurants[i].rating = (restaurants[i].rating * numOfReviews + parseInt(request.body.rating)) / (numOfReviews + 1);
         }
     }
+});
+
+app.post('/event/add', function (request, response) {
+    response.setHeader('Content-Type', 'application/json');
+    console.log(request.body);
+    const lastEvent = reviews[events.length - 1];
+    const id = lastEvent ? (parseInt(lastEvent.ID) + 1).toString() : '1';
+    const event = { name: request.body.name, description: request.body.description, start: request.body.start, end: request.body.end, restaurantID: request.body.restaurantID, ID: id };
+    events.push(event);
+    response.json(event);
 });
 
 app.get('/images/', function (request, response) {
