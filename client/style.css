@@ -26,6 +26,3 @@ fixes the problem where changing inner html would shift the element */
 #search-form, #searchTypeName, #formCollapse {
     width: 100vw;
 }
-
-#is_open[color_code="false"]{ color: red}
-#is_open[color_code="false"]{ color: green}

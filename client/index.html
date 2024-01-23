@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" style="min-width: 350px;" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8">
@@ -40,7 +40,7 @@
     </div>
   </nav>
   <div id="main-content">
-    <div id="searchArea">
+    <div id="searchArea" class="container-fluid">
       <h1 id="searchTypeName" class="mx-auto">Restaurants</h1>
       <form id="search-form">
         <div class="input-group mx-auto w-75">
@@ -97,8 +97,10 @@
           <button class="btn btn-primary btn-sm btn-md-none" type="submit">Search</button>
         </div>
       </form>
-      <div id="results" class="row row-cols-sm-2 row-cols-md-3 p-5 w-75 mx-auto"></div>
-      <div class="container container-sm container-md-none w-100">
+      <div class="container">
+        <div id="results" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-5 w-75 mx-auto"></div>
+      </div>
+      <div class="container container-sm container-md-none w-100" id="addRestaurantForm">
         <p class="d-inline-flex gap-1 w-100">
           <a class="btn btn-primary btn-block" data-bs-toggle="collapse" href="#collapseForm" role="button"
             aria-expanded="false" aria-controls="collapseForm" id="collapseLabel">
@@ -110,27 +112,95 @@
             <form id="create-form">
               <div class="mb-3">
                 <label for="name" class="form-label" id="nameLabel">Restaurant Name</label>
-                <input type="text" class="form-control" id="nameForm">
+                <input type="text" class="form-control" id="nameForm" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="desc" class="form-label">Description</label>
-                <textarea class="form-control" id="desc" rows="3"></textarea>
+                <textarea class="form-control" id="desc" rows="3" minlength="15" maxlength="200" required></textarea>
               </div>
               <div class="mb-3">
                 <label for="street" class="form-label" id="streetLabel">Street</label>
-                <input type="text" class="form-control" id="street">
+                <input type="text" class="form-control" id="street" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="city" class="form-label" id="cityLabel">City</label>
-                <input type="text" class="form-control" id="city">
+                <input type="text" class="form-control" id="city" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="address" class="form-label" id="addressLabel">Address</label>
-                <input type="text" class="form-control" id="address">
+                <input type="text" class="form-control" id="address" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="phoneNumber" class="form-label" id="phoneNumberLabel">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber">
+                <input type="tel" class="form-control" id="phoneNumber" required>
+              </div>
+              <div class="mb-3">
+                <div class="container">
+                  <p class="d-inline-flex">
+                    <a class="btn btn-primary btn-block" data-bs-toggle="collapse" href="#collapseTimes" role="button"
+                      aria-expanded="false" aria-controls="collapseTimes">
+                      Opening Times
+                    </a>
+                  </p>
+                  <div class="collapse" id="collapseTimes">
+                    <div class="mb-2">
+                      <p>Monday</p>
+                      <label for="mondayOpen">Open:</label>
+                      <input type="time" id="mondayOpen" name="mondayOpen" required>
+                      <label for="mondayClose">Close:</label>
+                      <input type="time" id="mondayClose" name="mondayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Tuesday</p>
+                      <label for="tuesdayOpen">Open:</label>
+                      <input type="time" id="tuesdayOpen" name="tuesdayOpen" required>
+                      <label for="tuesdayClose">Close:</label>
+                      <input type="time" id="tuesdayClose" name="tuesdayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Wednesday</p>
+                      <label for="wednesdayOpen">Open:</label>
+                      <input type="time" id="wednesdayOpen" name="wednesdayOpen" required>
+                      <label for="wednesdayClose">Close:</label>
+                      <input type="time" id="wednesdayClose" name="wednesdayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Thursday</p>
+                      <label for="thursdayOpen">Open:</label>
+                      <input type="time" id="thursdayOpen" name="thursdayOpen" required>
+                      <label for="thursdayClose">Close:</label>
+                      <input type="time" id="thursdayClose" name="thursdayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Friday</p>
+                      <label for="fridayOpen">Open:</label>
+                      <input type="time" id="fridayOpen" name="fridayOpen" required>
+
+                      <label for="fridayClose">Close:</label>
+                      <input type="time" id="fridayClose" name="fridayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Saturday</p>
+                      <label for="saturdayOpen">Open:</label>
+                      <input type="time" id="saturdayOpen" name="saturdayOpen" required>
+                      <label for="saturdayClose">Close:</label>
+                      <input type="time" id="saturdayClose" name="saturdayClose" required>
+                    </div>
+
+                    <div class="mb-2">
+                      <p>Sunday</p>
+                      <label for="sundayOpen">Open:</label>
+                      <input type="time" id="sundayOpen" name="sundayOpen" required>
+                      <label for="sundayClose">Close:</label>
+                      <input type="time" id="sundayClose" name="sundayClose" required>
+                    </div>
+                  </div>
+                </div>
               </div>
               <button type="submit" class="btn btn-primary">Add</button>
             </form>
@@ -150,7 +220,7 @@
     <div class="p-5" id="img"></div>
     <p class="p-5 mb-2" id="description"></p>
     <div class="row mx-auto">
-      <div class="col-md-6 w-25 mx-5">
+      <div class="col-md-6 mb-3">
         <h2>Opening Times</h2>
         <table class="table table-bordered table-striped">
           <thead>
@@ -164,7 +234,7 @@
           </tbody>
         </table>
       </div>
-      <div class="col-md-6 w-25 mx-auto">
+      <div class="col-md-6 mb-3 mx-auto">
         <h2>Info</h2>
         <!-- svg from https://icons.getbootstrap.com/icons/geo-alt-fill/ -->
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-geo-alt-fill"
@@ -179,15 +249,15 @@
             d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z" />
         </svg>
         <p id="phoneNumberInfo"></p>
-        <div class="row">
-          <div class="col-md-6 w-50">
+        <div class="row-cols-sm-1 row-cols-md-2">
+          <div class="col w-50">
             <p id="ratingInfo"></p>
           </div>
-          <div class="col-md-6" id="starsInfo"></div>
+          <div class="col" id="starsInfo"></div>
         </div>
       </div>
     </div>
-    <div class="row mx-auto">
+    <div class="row-cols-sm-1 row-cols-md-2 mx-auto">
       <div class="col-md-6 w-25 mx-auto">
         <h2>Reviews</h2>
         <div class="overflow-auto border" id="reviews"></div>
@@ -209,15 +279,17 @@
           <form id="review-form">
             <div class="mb-3">
               <label for="reviewTitle" class="form-label" id="reviewTitleLabel">Title</label>
-              <input type="text" class="form-control" id="reviewTitle" name="title" minlength="3" maxlength="30" required>
+              <input type="text" class="form-control" id="reviewTitle" name="title" minlength="3" maxlength="30"
+                required>
             </div>
             <div class="mb-3">
               <label for="nameReview" class="form-label">Name</label>
-              <input class="form-control" id="nameReview" name="name"  minlength="3" maxlength="30" required>
+              <input class="form-control" id="nameReview" name="name" minlength="3" maxlength="30" required>
             </div>
             <div class="mb-3">
               <label for="descReview" class="form-label">Description</label>
-              <textarea class="form-control" id="description" name="description" minlength="10" maxlength="250" required></textarea>
+              <textarea class="form-control" id="descReview" name="description" rows="3" minlength="10" maxlength="250"
+                required></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Rating</label>
@@ -281,7 +353,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoLabelModal" aria-hidden="true">
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -295,7 +367,7 @@
 
   </div>
 
-  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorLabelModal" aria-hidden="true">
+  <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body" id="errorBody"></div>
@@ -308,6 +380,7 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
   <script src="index.js"></script>
+  <script language="javascript" src="lz-string.js"></script>
 </body>
 
 </html>

@@ -210,7 +210,7 @@ async function loadEvent(ID) {
             `;
         }
         document.getElementById('events').innerHTML = html;
-        
+
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
@@ -242,15 +242,12 @@ async function search(rating = '', city = '', name = '') {
         }
         let html = '';
         for (let i = 0; i < data.length; i++) {
-            let title = data[i]["name"].substring(0, 17);
-            if (data[i]["name"].length > 17) {
-                title += '...';
-            }
-            html += `<div><div class="card col mb-3">
+            let title = data[i]["name"]
+            html += `<div class="col mb-3"><div class="card mb-3 h-100">
                         <img src="..." class="card-img-top" alt="...">
                         <div class="card-body">
-                        <h5 class="card-title text-nowrap" href=# style="text-align: center;">${title}</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <h5 class="card-title text-nowrap" href=# style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${title}</h5>
+                        <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${data[i]["description"]}</p>
                         <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? `loadRestaurant(${data[i].ID})` : `loadEvent(${data[i].ID})`} id="${data[i].ID}">Info Page</a>
                         </div>
                     </div>
@@ -292,12 +289,12 @@ function changeType(type) {
     if (type === 1) {
         document.getElementById('searchTypeName').innerHTML = 'Restaurants';
         document.getElementById('ratings').removeAttribute('hidden');
-        document.getElementById('collapseLabel').removeAttribute('hidden');
+        document.getElementById('addRestaurantForm').removeAttribute('hidden');
         return;
     }
     document.getElementById('searchTypeName').innerHTML = 'Events';
     document.getElementById('ratings').setAttribute('hidden', 'hidden');
-    document.getElementById('collapseLabel').setAttribute('hidden', 'hidden')
+    document.getElementById('addRestaurantForm').setAttribute('hidden', 'hidden')
 }
 
 function changeColourMode() {
