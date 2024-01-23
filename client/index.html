@@ -58,7 +58,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <label class="form-check-label" for="1">
-                    <input class="form-check-input" type="radio" name="rating" id="1" value="1">
+                    <input class="form-control" class="form-check-input" type="radio" name="rating" id="1" value="1">
                     1 and up
                   </label>
                 </div>
@@ -93,7 +93,7 @@
                   type="text" placeholder="City" /></div>
             </li>
           </ul>
-          <input id="name" name="name" type="text" class="form-control" aria-label="Text input with dropdown button" />
+          <input class="form-control" id="name" name="name" type="text" class="form-control" />
           <button class="btn btn-primary btn-sm btn-md-none" type="submit">Search</button>
         </div>
       </form>
@@ -109,30 +109,30 @@
         </p>
         <div class="collapse" id="collapseForm">
           <div class="card card-body">
-            <form id="create-form">
+            <form id="restaurantForm">
               <div class="mb-3">
                 <label for="name" class="form-label" id="nameLabel">Restaurant Name</label>
-                <input type="text" class="form-control" id="nameForm" minlength="3" maxlength="30" required>
+                <input type="text" class="form-control" id="nameForm" name="name" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="desc" class="form-label">Description</label>
-                <textarea class="form-control" id="desc" rows="3" minlength="15" maxlength="200" required></textarea>
+                <textarea class="form-control" id="desc" name="description" rows="3" minlength="15" maxlength="200" required></textarea>
               </div>
               <div class="mb-3">
                 <label for="street" class="form-label" id="streetLabel">Street</label>
-                <input type="text" class="form-control" id="street" minlength="3" maxlength="30" required>
+                <input type="text" class="form-control" id="street" name="city" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="city" class="form-label" id="cityLabel">City</label>
-                <input type="text" class="form-control" id="city" minlength="3" maxlength="30" required>
+                <input type="text" class="form-control" id="city" name="city" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="address" class="form-label" id="addressLabel">Address</label>
-                <input type="text" class="form-control" id="address" minlength="3" maxlength="30" required>
+                <input type="text" class="form-control" id="address" name="address" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="phoneNumber" class="form-label" id="phoneNumberLabel">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber" required>
+                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" required>
               </div>
               <div class="mb-3">
                 <div class="container">
@@ -146,62 +146,64 @@
                     <div class="mb-2">
                       <p>Monday</p>
                       <label for="mondayOpen">Open:</label>
-                      <input type="time" id="mondayOpen" name="mondayOpen" required>
+                      <input class="form-control" type="time" id="mondayOpen" name="mondayOpen">
                       <label for="mondayClose">Close:</label>
-                      <input type="time" id="mondayClose" name="mondayClose" required>
+                      <input class="form-control" type="time" id="mondayClose" name="mondayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Tuesday</p>
                       <label for="tuesdayOpen">Open:</label>
-                      <input type="time" id="tuesdayOpen" name="tuesdayOpen" required>
+                      <input class="form-control" type="time" id="tuesdayOpen" name="tuesdayOpen">
                       <label for="tuesdayClose">Close:</label>
-                      <input type="time" id="tuesdayClose" name="tuesdayClose" required>
+                      <input class="form-control" type="time" id="tuesdayClose" name="tuesdayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Wednesday</p>
                       <label for="wednesdayOpen">Open:</label>
-                      <input type="time" id="wednesdayOpen" name="wednesdayOpen" required>
+                      <input class="form-control" type="time" id="wednesdayOpen" name="wednesdayOpen">
                       <label for="wednesdayClose">Close:</label>
-                      <input type="time" id="wednesdayClose" name="wednesdayClose" required>
+                      <input class="form-control" type="time" id="wednesdayClose" name="wednesdayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Thursday</p>
                       <label for="thursdayOpen">Open:</label>
-                      <input type="time" id="thursdayOpen" name="thursdayOpen" required>
+                      <input class="form-control" type="time" id="thursdayOpen" name="thursdayOpen">
                       <label for="thursdayClose">Close:</label>
-                      <input type="time" id="thursdayClose" name="thursdayClose" required>
+                      <input class="form-control" type="time" id="thursdayClose" name="thursdayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Friday</p>
                       <label for="fridayOpen">Open:</label>
-                      <input type="time" id="fridayOpen" name="fridayOpen" required>
+                      <input class="form-control" type="time" id="fridayOpen" name="fridayOpen">
 
                       <label for="fridayClose">Close:</label>
-                      <input type="time" id="fridayClose" name="fridayClose" required>
+                      <input class="form-control" type="time" id="fridayClose" name="fridayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Saturday</p>
                       <label for="saturdayOpen">Open:</label>
-                      <input type="time" id="saturdayOpen" name="saturdayOpen" required>
+                      <input class="form-control" type="time" id="saturdayOpen" name="saturdayOpen">
                       <label for="saturdayClose">Close:</label>
-                      <input type="time" id="saturdayClose" name="saturdayClose" required>
+                      <input class="form-control" type="time" id="saturdayClose" name="saturdayClose">
                     </div>
 
                     <div class="mb-2">
                       <p>Sunday</p>
                       <label for="sundayOpen">Open:</label>
-                      <input type="time" id="sundayOpen" name="sundayOpen" required>
+                      <input class="form-control" type="time" id="sundayOpen" name="sundayOpen">
                       <label for="sundayClose">Close:</label>
-                      <input type="time" id="sundayClose" name="sundayClose" required>
+                      <input class="form-control" type="time" id="sundayClose" name="sundayClose">
                     </div>
                   </div>
                 </div>
               </div>
+              <label for="imgInput">Image of restaurant</label>
+              <input class="form-control" type="file" id="imgInput" name="img" accept="image/jpeg" required>
               <button type="submit" class="btn btn-primary">Add</button>
             </form>
           </div>
@@ -333,19 +335,20 @@
           <form id="event-form">
             <div class="mb-3">
               <label for="eventName" class="form-label" id="eventNameLabel">Name</label>
-              <input type="text" id="eventName" name="name" minlength="3" maxlength="30" required>
+              <input class="form-control" type="text" id="eventName" name="name" minlength="3" maxlength="30" required>
             </div>
             <div class="mb-3">
               <label for="descEvent" class="form-label">Description</label>
-              <textarea id="descEvent" name="description" minlength="10" maxlength="250" required></textarea>
+              <textarea class="form-control" id="descEvent" name="description" minlength="10" maxlength="250"
+                required></textarea>
             </div>
             <div class="mb-3">
               <label for="eventStart">Start date</label>
-              <input type="datetime-local" id="eventStart" name="start" required>
+              <input class="form-control" type="datetime-local" id="eventStart" name="start" required>
             </div>
             <div class="mb-3">
               <label for="eventEnd">Start date</label>
-              <input type="datetime-local" id="eventEnd" name="end" required>
+              <input class="form-control" type="datetime-local" id="eventEnd" name="end" required>
             </div>
             <button type="submit" class="btn btn-primary">Add</button>
           </form>
@@ -380,7 +383,7 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
   <script src="index.js"></script>
-  <script language="javascript" src="lz-string.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 </body>
 
 </html>

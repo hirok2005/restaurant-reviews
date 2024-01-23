@@ -415,3 +415,55 @@ eventForm.addEventListener("submit", async (event) => {
 
     loadRestaurant(currentRestaurantID);
 });
+
+const restaurantForm = document.getElementById('restaurantForm');
+let base64String;
+restaurantForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    try {
+    const formData = new FormData(restaurantForm);
+    let data = Object.fromEntries(formData.entries());
+    
+    const fileInput = document.getElementById('imgInput');
+    const file = fileInput.files[0];
+    const base64String = await readFile(file);
+
+    if (!(base64String.includes('jpg') || base64String.includes('jpeg'))) {
+        throw new Error('File must be of type JPG')
+    }
+
+    const compressedImg = LZString.compress(base64String);
+    data['img'] = compressedImg;
+    data = JSON.stringify(data);
+    console.log(data);
+    console.log(compressedImg.length, base64String.length);
+    const response = await fetch("/restaurant/add", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: data
+    });
+    event.target.reset()
+    scroll(0, 0);
+    new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
+
+    search(0);
+    } catch (e) {
+        handleError(e);
+    }
+
+});
+
+// https://stackoverflow.com/questions/34495796/javascript-promises-with-filereader
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        var fr = new FileReader();
+        fr.onload = () => {
+            resolve(fr.result);
+        };
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+    });
+}
