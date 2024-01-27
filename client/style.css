@@ -26,3 +26,5 @@ fixes the problem where changing inner html would shift the element */
 #search-form, #searchTypeName, #formCollapse {
     width: 100vw;
 }
+
+

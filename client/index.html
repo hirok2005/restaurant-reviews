@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="min-width: 350px;" data-bs-theme="light">
+<html lang="en" data-bs-theme="light">
 
 <head>
   <meta charset="UTF-8">
@@ -11,9 +11,9 @@
   <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="mb-5">
+<body>
   <nav class="navbar navbar-expand-sm border-bottom">
-    <a class="navbar-brand p-2">Restaurant ...</a>
+    <a class="navbar-brand p-2">Restaurant</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -40,7 +40,7 @@
     </div>
   </nav>
   <div id="main-content">
-    <div id="searchArea" class="container-fluid">
+    <div id="search-view" class="container-fluid view">
       <h1 id="searchTypeName" class="mx-auto">Restaurants</h1>
       <form id="search-form">
         <div class="input-group mx-auto w-75">
@@ -58,7 +58,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                   <label class="form-check-label" for="1">
-                    <input class="form-control" class="form-check-input" type="radio" name="rating" id="1" value="1">
+                    <input class="form-check-input" class="form-check-input" type="radio" name="rating" id="1" value="1">
                     1 and up
                   </label>
                 </div>
@@ -98,7 +98,7 @@
         </div>
       </form>
       <div class="container">
-        <div id="results" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 p-5 w-75 mx-auto"></div>
+        <div id="results" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 w-75 mt-3 mx-auto"></div>
       </div>
       <div class="container container-sm container-md-none w-100" id="addRestaurantForm">
         <p class="d-inline-flex gap-1 w-100">
@@ -120,7 +120,7 @@
               </div>
               <div class="mb-3">
                 <label for="street" class="form-label" id="streetLabel">Street</label>
-                <input type="text" class="form-control" id="street" name="city" minlength="3" maxlength="30" required>
+                <input type="text" class="form-control" id="street" name="street" minlength="3" maxlength="30" required>
               </div>
               <div class="mb-3">
                 <label for="city" class="form-label" id="cityLabel">City</label>
@@ -132,7 +132,7 @@
               </div>
               <div class="mb-3">
                 <label for="phoneNumber" class="form-label" id="phoneNumberLabel">Phone Number</label>
-                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" required>
+                <input type="tel" class="form-control" id="phoneNumber" name="phone_number" pattern="07\d{9}" required>
               </div>
               <div class="mb-3">
                 <div class="container">
@@ -202,8 +202,6 @@
                   </div>
                 </div>
               </div>
-              <label for="imgInput">Image of restaurant</label>
-              <input class="form-control" type="file" id="imgInput" name="img" accept="image/jpeg" required>
               <button type="submit" class="btn btn-primary">Add</button>
             </form>
           </div>
@@ -216,7 +214,7 @@
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
-  <div id="info" style="display: none;">
+  <div id="info-view" class="view" style="display: none;">
     <h1 class="mx-auto" id="nameTitle"></h1>
     <h6 id="currentlyOpen"></h6>
     <div class="p-5" id="img"></div>
@@ -259,12 +257,12 @@
         </div>
       </div>
     </div>
-    <div class="row-cols-sm-1 row-cols-md-2 mx-auto">
-      <div class="col-md-6 w-25 mx-auto">
+    <div class="row mx-auto">
+      <div class="col-md-6 mb-3">
         <h2>Reviews</h2>
         <div class="overflow-auto border" id="reviews"></div>
       </div>
-      <div class="col-md-6 w-25 mx-auto">
+      <div class="col-md-6 mb-3">
         <h2>Events</h2>
         <div class="overflow-auto border" id="events"></div>
       </div>
@@ -383,7 +381,7 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
   <script src="index.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+
 </body>
 
 </html>

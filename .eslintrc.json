@@ -8,7 +8,7 @@
     "parserOptions": {
         "ecmaVersion": "latest"
     },
-    "ignorePatterns": ["index.js"],
+    "ignorePatterns": ["index.js", "app.test.js"],
     "rules": {
         "semi": [
             2,

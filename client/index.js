@@ -1,6 +1,7 @@
 let searchType = 1; // 1 for restaurants 0 for events
-let currentRestaurantID; // these make sure for slow connections info from previous request is not shown while waiting for new request
+let currentInfoID; // these make sure for slow connections info from previous request is not shown while waiting for new request
 let currentEventID;
+let currentRequest;
 const currDate = new Date().toISOString();
 const days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 
@@ -35,36 +36,35 @@ function isOpen(openingTimes) {
     return (times[0] <= currTime && currTime < times[1]);
 }
 
-async function loadSearchDiv() {
-    document.getElementById('info').style.display = 'none';
-    document.getElementById('searchArea').style.display = 'block';
-    document.getElementById('spinner').style.display = 'none';
-    await search('0');
-}
-
 async function loadRestaurant(ID) {
-    currentRestaurantID = ID.toString();
-    document.getElementById('searchArea').style.display = 'none';
+    currentInfoID = ID.toString();
     document.getElementById('spinner').style.display = 'block';
     tableBody = document.getElementById('tableBody');
-    const content = document.getElementById('info');
     let html = '';
     let review;
     let event;
     try {
-        const response = await fetch('/restaurant/?ID=' + ID);
-        // const imgResponse = await fetch('/images/?ID=' + ID);
-        const reviewResponse = await fetch('/reviews/?restaurantID=' + ID);
-        const eventResponse = await fetch('/events/?upcoming=T&restaurantID=' + ID);
-        if (!isOk(response)) {
+        currentRequest = await fetch('/restaurant/?ID=' + ID);
+        if (!isOk(currentRequest)) {
             return;
         }
-        const info = await response.json();
-        const reviews = await reviewResponse.json();
-        const events = await eventResponse.json();
-        console.log(info["ID"] !== currentRestaurantID)
-        console.log(info["ID"], currentRestaurantID)
-        if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentRestaurantID) {
+        const info = await currentRequest.json();
+        currentRequest = await fetch('/reviews/?restaurantID=' + ID);
+        let reviews = [];
+        if (currentRequest.status !== 204) {
+            reviews = await currentRequest.json();
+        }
+        currentRequest = await fetch('/events/?upcoming=T&restaurantID=' + ID);
+        let events = [];
+        if (currentRequest.status !== 204) {
+            events = await currentRequest.json();
+        }
+
+        currentRequest = null;
+
+        console.log(info["ID"] !== currentInfoID)
+        console.log(info["ID"], currentInfoID)
+        if (document.getElementById('search-view').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
             return;
         }
@@ -123,7 +123,6 @@ async function loadRestaurant(ID) {
         document.getElementById('events').innerHTML = html;
 
         document.getElementById('spinner').style.display = 'none';
-        document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
         handleError(e)
@@ -133,7 +132,6 @@ async function loadRestaurant(ID) {
 async function loadEvent(ID) {
 
     currentEventID = ID.toString();
-    document.getElementById('searchArea').style.display = 'none';
     document.getElementById('spinner').style.display = 'block';
     tableBody = document.getElementById('tableBody');
     const content = document.getElementById('info');
@@ -141,24 +139,28 @@ async function loadEvent(ID) {
     let review;
     let event;
     try {
-        const response = await fetch('/restaurant/?ID=' + ID);
-        // const imgResponse = await fetch('/images/?ID=' + ID);
-        const reviewResponse = await fetch('/reviews/?restaurantID=' + ID);
-        const eventResponse = await fetch('/events/?upcoming=T&restaurantID=' + ID);
-        if (!isOk(response)) {
+        currentRequest = await fetch('/event/?ID=' + ID);
+        if (!isOk(currentRequest)) {
             return;
         }
-        const info = await response.json();
-        const reviews = await reviewResponse.json();
-        const events = await eventResponse.json();
-        console.log(info["ID"] !== currentRestaurantID)
-        console.log(info["ID"], currentRestaurantID)
-        if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentRestaurantID) {
+        event = await currentRequest.json();
+        currentRequest = await fetch('/restaurant/?ID=' + info['restaurantID']);
+        if (!isOk(currentRequest)) {
+            return;
+        }
+
+        restaurantInfo = await currentRequest.json();
+
+        currentRequest = null;
+
+        console.log(info["ID"] !== currentInfoID)
+        console.log(info["ID"], currentInfoID)
+        if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
             return;
         }
         html = '';
-        document.getElementById('nameTitle').innerHTML = info['name'];
+        document.getElementById('nameTitle').innerHTML = info['title'];
         for (let i = 0; i < 7; i++) {
             html += `<tr>
             <th scope="row">${days[i]}</th>
@@ -214,7 +216,6 @@ async function loadEvent(ID) {
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
-        console.log('hmmmm');
     } catch (e) {
         handleError(e)
     }
@@ -223,32 +224,37 @@ async function loadEvent(ID) {
 async function search(rating = '', city = '', name = '') {
     searchPlaceHolder();
     let response;
-    const content = document.getElementById('main-content');
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
         if (searchType === 1) {
-            response = await fetch('/restaurants?' + query, { signal: AbortSignal.timeout(5000) });
+            currentRequest = await fetch('/restaurants?' + query);
         } else {
-            response = await fetch('/events?' + query);
+            currentRequest = await fetch('/events?' + query);
         }
-        if (!isOk(response)) {
+        if (!isOk(currentRequest)) {
             return;
         }
-        const data = await response.json();
+        let data = [];
+        if (currentRequest.status !== 204) {
+            data = await currentRequest.json();
+        }
+
+        currentRequest = null;
+
         const results = document.getElementById('results');
         if (data.length === 0) {
             results.innerHTML = '<h1 class="alert alert-danger p-3 mb-2" style="margin-top: 100px;">No results found!<h1>';
             return;
         }
+
         let html = '';
         for (let i = 0; i < data.length; i++) {
             let title = data[i]["name"]
-            html += `<div class="col mb-3"><div class="card mb-3 h-100">
-                        <img src="..." class="card-img-top" alt="...">
+            html += `<div class="col mb-3"><div class="card h-100">
                         <div class="card-body">
                         <h5 class="card-title text-nowrap" href=# style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${title}</h5>
                         <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${data[i]["description"]}</p>
-                        <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? `loadRestaurant(${data[i].ID})` : `loadEvent(${data[i].ID})`} id="${data[i].ID}">Info Page</a>
+                        <a href="#" class="btn btn-primary" onclick="changeView('info', ${data[i].ID})" id="${data[i].ID}">Info Page</a>
                         </div>
                     </div>
                     </div>`;
@@ -261,11 +267,14 @@ async function search(rating = '', city = '', name = '') {
 
 async function showInfoModal(ID, type) {
     try {
-        response = await fetch(`/${type}/?ID=` + ID);
-        if (!isOk(response)) {
+        currentRequest = await fetch(`/${type}/?ID=` + ID);
+        if (!isOk(currentRequest)) {
             return;
         }
-        const info = await response.json();
+        const info = await currentRequest.json();
+
+        currentRequest = null;
+
         document.getElementById('infoTitleModal').innerHTML = type === 'review' ? info['title'] : info['name'];
         document.getElementById('infoBody').innerHTML = type === 'review' ? `<div id="reviewBodyStars"></div>
                                                             <h5>${info['name']}</h5>
@@ -283,9 +292,25 @@ async function showInfoModal(ID, type) {
     }
 }
 
+async function changeView(view, ID=null) {
+    if (currentRequest) {
+        currentRequest.cancel();
+    }
+    document.getElementById('search-view').style.display = 'none';
+    document.getElementById('info-view').style.display = 'none';
+    document.getElementById('spinner').style.display = 'none';
+    if (view === 'search') {
+        document.getElementById('search-view').style.display = 'block';
+        search('0');
+    } else {
+        loadRestaurant(ID);
+        document.getElementById('info-view').style.display = 'block';
+    }
+} 
+
 function changeType(type) {
     searchType = type;
-    loadSearchDiv();
+    changeView('search');
     if (type === 1) {
         document.getElementById('searchTypeName').innerHTML = 'Restaurants';
         document.getElementById('ratings').removeAttribute('hidden');
@@ -310,7 +335,6 @@ function searchPlaceHolder() {
     let html = '';
     for (let i = 0; i < 9; i++) {
         html += `<div><div class="card mb-3" aria-hidden="true">
-        <img src="..." class="card-img-top" alt="...">
         <div class="card-body">
           <h5 class="card-title placeholder-glow" style="text-align: center;">
             <span class="placeholder col-6"></span>
@@ -366,104 +390,120 @@ submitForm.addEventListener('submit', async function (event) {
 
 restaurantButton.addEventListener('click', async function (event) {
     event.preventDefault();
-    loadSearchDiv();
+    changeView('search');
 });
 
 document.addEventListener('DOMContentLoaded', async function (event) {
-    loadSearchDiv();
+    changeView('search');
 });
 
 const reviewForm = document.getElementById('review-form');
 
 reviewForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    let formData = new FormData(reviewForm);
-    formData.append("restaurantID", currentRestaurantID);
-    const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-    console.log(jsonData);
-    const response = await fetch("/review/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: jsonData
-    });
-    event.target.reset()
-    scroll(0, 0);
-    new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+    try {
+        const formData = new FormData(reviewForm);
+        formData.append("restaurantID", currentInfoID);
+        const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
+        console.log(jsonData);
+        currentRequest = await fetch("/review/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: jsonData
+        });
 
-    loadRestaurant(currentRestaurantID);
+        if (currentRequest.status === 409) {
+            throw new Error('Review must be unique');
+        }
+
+        currentRequest = null;
+
+        event.target.reset()
+        scroll(0, 0);
+        new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+
+        loadRestaurant(currentInfoID);
+    } catch (e) {
+        handleError(e);
+    }
 });
 
 const eventForm = document.getElementById('event-form');
 
 eventForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const formData = new FormData(eventForm);
-    formData.append("restaurantID", currentRestaurantID);
-    const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-    const response = await fetch("/event/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: jsonData
-    });
-    event.target.reset()
-    scroll(0, 0);
-    new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
+    try {
+        const formData = new FormData(eventForm);
+        formData.append("restaurantID", currentInfoID);
+        const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
 
-    loadRestaurant(currentRestaurantID);
+        if (document.getElementById('eventStart').value > document.getElementById('eventEnd').value) {
+            throw new Error('Event date must be valid, ends after it starts');
+        }
+
+        currentRequest = await fetch("/event/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: jsonData
+        });
+
+        if (currentRequest.status === 409) {
+            throw new Error('Event name must be unique');
+        }
+
+        currentRequest = null;
+
+        event.target.reset()
+        scroll(0, 0);
+        new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
+
+        loadRestaurant(currentInfoID);
+    } catch (e) {
+        handleError(e);
+    }
 });
 
 const restaurantForm = document.getElementById('restaurantForm');
-let base64String;
 restaurantForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     try {
-    const formData = new FormData(restaurantForm);
-    let data = Object.fromEntries(formData.entries());
-    
-    const fileInput = document.getElementById('imgInput');
-    const file = fileInput.files[0];
-    const base64String = await readFile(file);
+        const formData = new FormData(restaurantForm);
+        let data = Object.fromEntries(formData.entries());
 
-    if (!(base64String.includes('jpg') || base64String.includes('jpeg'))) {
-        throw new Error('File must be of type JPG')
-    }
+        const times = restaurantForm.querySelectorAll('input[type="time"]');
+        for (let i = 0; i < times.length; i += 2) {
+            if (times[i].value > times[i + 1].value) {
+                throw new Error('Invalid opening time entered, opening time must be before closing');
+            }
+        }
+        data = JSON.stringify(data);
+        console.log(data);
+        currentRequest = await fetch("/restaurant/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: data
+        });
 
-    const compressedImg = LZString.compress(base64String);
-    data['img'] = compressedImg;
-    data = JSON.stringify(data);
-    console.log(data);
-    console.log(compressedImg.length, base64String.length);
-    const response = await fetch("/restaurant/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: data
-    });
-    event.target.reset()
-    scroll(0, 0);
-    new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
+        if (currentRequest.status === 409) {
+            throw new Error("Restaurant already exists");
+        }
 
-    search(0);
+        currentRequest = null;
+
+        event.target.reset()
+        scroll(0, 0);
+        new bootstrap.Collapse(document.getElementById('collapseForm')).toggle();
+
+        search(0);
     } catch (e) {
         handleError(e);
     }
 
 });
-
-// https://stackoverflow.com/questions/34495796/javascript-promises-with-filereader
-function readFile(file) {
-    return new Promise((resolve, reject) => {
-        var fr = new FileReader();
-        fr.onload = () => {
-            resolve(fr.result);
-        };
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
-    });
-}

@@ -41,7 +41,7 @@
                     "23:00"
                 ]
             ],
-            "ID": "1"
+            "ID": "1"            
         },
         {
             "name": "Tapas Factory",
@@ -84,7 +84,7 @@
                     "22:00"
                 ]
             ],
-            "ID": "2"
+            "ID": "2"            
         },
         {
             "name": "The Food Pit",
@@ -127,7 +127,7 @@
                     "21:00"
                 ]
             ],
-            "ID": "3"
+            "ID": "3"            
         },
         {
             "name": "Fat Hippo Durham",
@@ -170,7 +170,7 @@
                     "21:00"
                 ]
             ],
-            "ID": "4"
+            "ID": "4"            
         }
     ],
     "reviews": [
@@ -341,11 +341,7 @@
             "description": "Enjoy up to 50% off on selected items this Friday for you and your family to enjoy!",
             "start": "2025-02-14T12:30",
             "end": "2024-02-14T12:30",
-            "address": [
-                "Unit R07 The Riverwalk",
-                "Newcastle",
-                "DH1 4SL"
-            ],
+            "city": "Durham",
             "restaurantID": "1",
             "ID": "1"
         }
