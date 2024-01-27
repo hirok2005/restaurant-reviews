@@ -1,8 +1,12 @@
 const path = require('node:path');
 const Fuse = require('fuse.js');
+const compression = require('compression');
 const express = require('express');
 const fs = require('fs');
 const app = express();
+app.use(compression());
+app.use(express.json({ limit: '50mb', extended: true }));
+app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.use(express.json());
 
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json')));
@@ -39,7 +43,6 @@ app.get('/restaurants/', function (request, response) {
     if (request.query.city !== undefined && request.query.city !== '') {
         filterRestaurants = filterRestaurants.filter(restaurant => restaurant.address[1].toLowerCase() === request.query.city.toLowerCase().trim());
     }
-    console.log(typeof (request.query.rating));
     if (request.query.rating !== undefined) {
         filterRestaurants = filterRestaurants.filter(restaurant => restaurant.rating >= parseInt(request.query.rating));
     }
@@ -103,7 +106,6 @@ app.get('/review/', function (request, response) {
 app.get('/events/', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     let filterEvents = events;
-    console.log(request.query);
     if (request.query.name !== undefined && request.query.name !== '') {
         filterEvents = eventSearch.search(request.query.name).map(item => item.item);
     }
@@ -159,13 +161,15 @@ app.get('/imgs/', function (request, response) {
     }
 
     if (arr[1].length === 0) {
-        response.status = 204;
+        response.sendStatus(204);
+        return;
     }
 
-    if (request.body.all) {
+    console.log(arr.length, request.query.all);
+    if (request.query.all === 'T') {
         response.json(arr[1]);
     } else {
-        response.json(arr[1][0]);
+        response.json([arr[1][arr[1].length - 1]]);
     }
 });
 
@@ -176,13 +180,15 @@ app.post('/imgs/add', function (request, response) {
         return;
     }
 
-    for (const restaurant of imgs) {
-        if (restaurant[0] === request.body.ID) {
-            restaurant[1].push(request.body.img);
+    for (let i = 0; i < imgs.length; i++) {
+        if (imgs[i][0] === request.body.ID) {
+            console.log(imgs[i]);
+            imgs[i][1].push(request.body.img);
             response.sendStatus(201);
             return;
         }
     }
+
     response.sendStatus(404);
 });
 
@@ -267,8 +273,6 @@ app.post('/review/add', function (request, response) {
 
 app.post('/event/add', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
-
-    console.log(request.body);
 
     if (paramsEvent.filter(key => !(key in request.body)).length > 0) {
         response.sendStatus(400);

@@ -32,7 +32,6 @@ function isOpen(openingTimes) {
     if (!times[0]) {
         return false;
     }
-    console.log((times[0] <= currTime && currTime < times[1]))
     return (times[0] <= currTime && currTime < times[1]);
 }
 
@@ -60,10 +59,13 @@ async function loadRestaurant(ID) {
             events = await currentRequest.json();
         }
 
+        currentRequest = await fetch('/imgs/?all=T&ID=' + ID);
+        let imgs = [];
+        if (currentRequest.status !== 204) {
+            imgs = await currentRequest.json();
+        }
         currentRequest = null;
 
-        console.log(info["ID"] !== currentInfoID)
-        console.log(info["ID"], currentInfoID)
         if (document.getElementById('search-view').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
             return;
@@ -122,6 +124,17 @@ async function loadRestaurant(ID) {
         }
         document.getElementById('events').innerHTML = html;
 
+
+        html = '';
+        console.log(imgs.length);
+        for (let i = 0; i < imgs.length; i++) {
+            console.log(i);
+            html += `<div class='carousel-item item${i === 0 ? ' active' : ''}'>
+                        <img src='${imgs[i]}' class='d-block w-100'>
+                    </div>`;
+        }
+        document.getElementById('imgHolder').innerHTML = html;
+
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
@@ -153,8 +166,6 @@ async function loadEvent(ID) {
 
         currentRequest = null;
 
-        console.log(info["ID"] !== currentInfoID)
-        console.log(info["ID"], currentInfoID)
         if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
             return;
@@ -170,10 +181,8 @@ async function loadEvent(ID) {
         }
         tableBody.innerHTML = html;
         document.getElementById('description').innerHTML = info['description'];
-        console.log(info)
         if (isOpen(info['opening_times'])) {
 
-            console.log("here")
             document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() > 0 ? new Date().getDay() - 1 : 6][1];
             document.getElementById('currentlyOpen').style.color = 'green';
         } else {
@@ -292,7 +301,7 @@ async function showInfoModal(ID, type) {
     }
 }
 
-async function changeView(view, ID=null) {
+async function changeView(view, ID = null) {
     if (currentRequest) {
         currentRequest.cancel();
     }
@@ -306,7 +315,7 @@ async function changeView(view, ID=null) {
         loadRestaurant(ID);
         document.getElementById('info-view').style.display = 'block';
     }
-} 
+}
 
 function changeType(type) {
     searchType = type;
@@ -405,7 +414,6 @@ reviewForm.addEventListener("submit", async (event) => {
         const formData = new FormData(reviewForm);
         formData.append("restaurantID", currentInfoID);
         const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-        console.log(jsonData);
         currentRequest = await fetch("/review/add", {
             method: "POST",
             headers: {
@@ -482,7 +490,6 @@ restaurantForm.addEventListener("submit", async (event) => {
             }
         }
         data = JSON.stringify(data);
-        console.log(data);
         currentRequest = await fetch("/restaurant/add", {
             method: "POST",
             headers: {
@@ -507,3 +514,38 @@ restaurantForm.addEventListener("submit", async (event) => {
     }
 
 });
+
+async function uploadImg(files) {
+    const fileType = files[0].type;
+    if (!(fileType === 'image/jpeg' || fileType === 'image/jpg')) {
+        throw new Error('File type must be of JPEG/JPG type')
+    }
+
+    const base64Img = await readFile(files[0]);
+
+    const data = { ID: currentInfoID, img: base64Img };
+    currentRequest = await fetch('/imgs/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    scroll(0, 0);
+    loadRestaurant(currentInfoID);
+}
+
+currentRequest = null;
+
+
+// https://stackoverflow.com/questions/34495796/javascript-promises-with-filereader
+function readFile(file) {
+    return new Promise((resolve, reject) => {
+        var fr = new FileReader();
+        fr.onload = () => {
+            resolve(fr.result);
+        };
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+    });
+}
