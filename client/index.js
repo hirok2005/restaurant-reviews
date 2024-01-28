@@ -6,7 +6,6 @@ const currDate = new Date().toISOString();
 const days = ['Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'];
 
 const restaurantButton = document.getElementById('restaurant');
-// TODO make error pages nice
 
 function isOk(response) {
     if (response.ok) {
@@ -21,8 +20,30 @@ function handleError(e) {
     if (document.getElementById('errorModal').classList.contains('show')) {
         return;
     }
+    if (e.message === 'Failed to fetch') {
+        e = 'Sorry connection to the server was lost, please try again later';
+    }
     document.getElementById('errorBody').innerHTML = e
     new bootstrap.Modal(document.getElementById('errorModal'), {}).show()
+}
+
+async function getRequest(url) {
+    try {
+        currentRequest = await fetch(url);
+        if (!isOk(currentRequest)) {
+            currentRequest = null;
+            return null;
+        }
+        if (currentRequest.status === 204) {
+            currentRequest = null;
+            return [];
+        }
+        data = await currentRequest.json();
+        currentRequest = null;
+        return data;
+    } catch (e) {
+        handleError(e);
+    }
 }
 
 function isOpen(openingTimes) {
@@ -43,28 +64,13 @@ async function loadRestaurant(ID) {
     let review;
     let event;
     try {
-        currentRequest = await fetch('/restaurant/?ID=' + ID);
-        if (!isOk(currentRequest)) {
+        const info = await getRequest('/restaurant/?ID=' + ID);
+        if (info === null) {
             return;
         }
-        const info = await currentRequest.json();
-        currentRequest = await fetch('/reviews/?restaurantID=' + ID);
-        let reviews = [];
-        if (currentRequest.status !== 204) {
-            reviews = await currentRequest.json();
-        }
-        currentRequest = await fetch('/events/?upcoming=T&restaurantID=' + ID);
-        let events = [];
-        if (currentRequest.status !== 204) {
-            events = await currentRequest.json();
-        }
-
-        currentRequest = await fetch('/imgs/?all=T&ID=' + ID);
-        let imgs = [];
-        if (currentRequest.status !== 204) {
-            imgs = await currentRequest.json();
-        }
-        currentRequest = null;
+        const reviews = await getRequest('/reviews/?restaurantID=' + ID);
+        const events = await getRequest('/events/?upcoming=T&restaurantID=' + ID);
+        const imgs = await getRequest('/imgs/?all=T&ID=' + ID);
 
         if (document.getElementById('search-view').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
@@ -81,7 +87,7 @@ async function loadRestaurant(ID) {
         }
         tableBody.innerHTML = html;
         document.getElementById('description').innerHTML = info['description'];
-        console.log(info)
+
         if (isOpen(info['opening_times'])) {
 
             console.log("here")
@@ -136,6 +142,7 @@ async function loadRestaurant(ID) {
         document.getElementById('imgHolder').innerHTML = html;
 
         document.getElementById('spinner').style.display = 'none';
+        document.getElementById('info-view').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
         handleError(e)
@@ -149,22 +156,9 @@ async function loadEvent(ID) {
     tableBody = document.getElementById('tableBody');
     const content = document.getElementById('info');
     let html = '';
-    let review;
-    let event;
     try {
-        currentRequest = await fetch('/event/?ID=' + ID);
-        if (!isOk(currentRequest)) {
-            return;
-        }
-        event = await currentRequest.json();
-        currentRequest = await fetch('/restaurant/?ID=' + info['restaurantID']);
-        if (!isOk(currentRequest)) {
-            return;
-        }
-
-        restaurantInfo = await currentRequest.json();
-
-        currentRequest = null;
+        const event = await getRequest('/event/?ID=' + ID);
+        const restaurantInfo = await getRequest('/restaurant/?ID=' + info['restaurantID']);
 
         if (document.getElementById('searchArea').style.display === 'block' || info["ID"] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
@@ -172,14 +166,6 @@ async function loadEvent(ID) {
         }
         html = '';
         document.getElementById('nameTitle').innerHTML = info['title'];
-        for (let i = 0; i < 7; i++) {
-            html += `<tr>
-            <th scope="row">${days[i]}</th>
-            <td>${info['opening_times'][i][0] ? info['opening_times'][i][0] : 'closed'}</td>
-            <td>${info['opening_times'][i][0] ? info['opening_times'][i][1] : 'closed'}</td>
-            </tr>`
-        }
-        tableBody.innerHTML = html;
         document.getElementById('description').innerHTML = info['description'];
         if (isOpen(info['opening_times'])) {
 
@@ -194,34 +180,6 @@ async function loadEvent(ID) {
         document.getElementById('ratingInfo').innerHTML = `${info['rating'].toFixed(1)} (${reviews.length} reviews)`;
         drawStars('starsInfo', info['rating']);
 
-        html = '';
-        const ratings = [];
-        for (let i = 0; i < reviews.length; i++) {
-            review = reviews[i];
-            ratings.push(review['rating'])
-            html += `<div class="border px-2 pb-2"><h4>${review['title']}</h4>
-            <div id="stars${i}"></div>
-            <h5>${review['name']}</h5>
-            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${review['ID']}, 'review')" id="${review['ID']}">Expand</a>
-            </div>
-            `;
-        }
-        document.getElementById('reviews').innerHTML = html;
-        for (let i = 0; i < reviews.length; i++) {
-            drawStars('stars' + i.toString(), ratings[i]);
-        }
-
-        html = '';
-        for (let i = 0; i < events.length; i++) {
-            let a = events[i];
-            html += `<div class="border px-2 pb-2"><h4>${a['name']}</h4>
-            <p>${a['start']}</p>
-            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${a['ID']}, 'event')" id="${a['ID']}">Expand</a>
-            </div>
-            `;
-        }
-        document.getElementById('events').innerHTML = html;
-
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
@@ -232,23 +190,10 @@ async function loadEvent(ID) {
 
 async function search(rating = '', city = '', name = '') {
     searchPlaceHolder();
-    let response;
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
-        if (searchType === 1) {
-            currentRequest = await fetch('/restaurants?' + query);
-        } else {
-            currentRequest = await fetch('/events?' + query);
-        }
-        if (!isOk(currentRequest)) {
-            return;
-        }
-        let data = [];
-        if (currentRequest.status !== 204) {
-            data = await currentRequest.json();
-        }
-
-        currentRequest = null;
+        const data = await getRequest(searchType === 1 ? '/restaurants?' + query : '/events?' + query);
+        console.log(data);
 
         const results = document.getElementById('results');
         if (data.length === 0) {
@@ -276,13 +221,7 @@ async function search(rating = '', city = '', name = '') {
 
 async function showInfoModal(ID, type) {
     try {
-        currentRequest = await fetch(`/${type}/?ID=` + ID);
-        if (!isOk(currentRequest)) {
-            return;
-        }
-        const info = await currentRequest.json();
-
-        currentRequest = null;
+        const info = await getRequest(`/${type}/?ID=${ID}`);
 
         document.getElementById('infoTitleModal').innerHTML = type === 'review' ? info['title'] : info['name'];
         document.getElementById('infoBody').innerHTML = type === 'review' ? `<div id="reviewBodyStars"></div>
@@ -302,8 +241,10 @@ async function showInfoModal(ID, type) {
 }
 
 async function changeView(view, ID = null) {
+    console.log(currentRequest);
     if (currentRequest) {
         currentRequest.cancel();
+        currentRequest = null;
     }
     document.getElementById('search-view').style.display = 'none';
     document.getElementById('info-view').style.display = 'none';
@@ -313,7 +254,6 @@ async function changeView(view, ID = null) {
         search('0');
     } else {
         loadRestaurant(ID);
-        document.getElementById('info-view').style.display = 'block';
     }
 }
 
@@ -406,15 +346,16 @@ document.addEventListener('DOMContentLoaded', async function (event) {
     changeView('search');
 });
 
-const reviewForm = document.getElementById('review-form');
 
-reviewForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+
+async function postForm(formID, type, needRestaurantID = false) {
     try {
-        const formData = new FormData(reviewForm);
-        formData.append("restaurantID", currentInfoID);
+        const formData = new FormData(document.getElementById(formID));
+        if (needRestaurantID) {
+            formData.append("restaurantID", currentInfoID);
+        }
         const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-        currentRequest = await fetch("/review/add", {
+        currentRequest = await fetch(`/${type}/add`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -423,19 +364,23 @@ reviewForm.addEventListener("submit", async (event) => {
         });
 
         if (currentRequest.status === 409) {
-            throw new Error('Review must be unique');
+            currentRequest = null;
+            throw new Error('An instance already exists, please create a unique ' + type);
         }
-
         currentRequest = null;
-
-        event.target.reset()
-        scroll(0, 0);
-        new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
-
-        loadRestaurant(currentInfoID);
     } catch (e) {
         handleError(e);
     }
+}
+
+const reviewForm = document.getElementById('review-form');
+reviewForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await postForm('review-form', 'review', true);
+    event.target.reset()
+    scroll(0, 0);
+    new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+    loadRestaurant(currentInfoID);
 });
 
 const eventForm = document.getElementById('event-form');
@@ -443,32 +388,13 @@ const eventForm = document.getElementById('event-form');
 eventForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-        const formData = new FormData(eventForm);
-        formData.append("restaurantID", currentInfoID);
-        const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
-
         if (document.getElementById('eventStart').value > document.getElementById('eventEnd').value) {
             throw new Error('Event date must be valid, ends after it starts');
         }
-
-        currentRequest = await fetch("/event/add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: jsonData
-        });
-
-        if (currentRequest.status === 409) {
-            throw new Error('Event name must be unique');
-        }
-
-        currentRequest = null;
-
+        await postForm('event-form', 'event', true);
         event.target.reset()
         scroll(0, 0);
         new bootstrap.Collapse(document.getElementById('collapseFormEvent')).toggle();
-
         loadRestaurant(currentInfoID);
     } catch (e) {
         handleError(e);
@@ -478,36 +404,17 @@ eventForm.addEventListener("submit", async (event) => {
 const restaurantForm = document.getElementById('restaurantForm');
 restaurantForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-
     try {
-        const formData = new FormData(restaurantForm);
-        let data = Object.fromEntries(formData.entries());
-
         const times = restaurantForm.querySelectorAll('input[type="time"]');
         for (let i = 0; i < times.length; i += 2) {
             if (times[i].value > times[i + 1].value) {
                 throw new Error('Invalid opening time entered, opening time must be before closing');
             }
         }
-        data = JSON.stringify(data);
-        currentRequest = await fetch("/restaurant/add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: data
-        });
-
-        if (currentRequest.status === 409) {
-            throw new Error("Restaurant already exists");
-        }
-
-        currentRequest = null;
-
+        await postForm('restaurantForm', 'restaurant');
         event.target.reset()
         scroll(0, 0);
         new bootstrap.Collapse(document.getElementById('collapseForm')).toggle();
-
         search(0);
     } catch (e) {
         handleError(e);
@@ -531,12 +438,15 @@ async function uploadImg(files) {
         },
         body: JSON.stringify(data)
     })
+    if (currentRequest.status === 409) {
+        currentRequest = null;
+        throw new Error('Image already exists')
+    }
+
     scroll(0, 0);
     loadRestaurant(currentInfoID);
+    currentRequest = null;
 }
-
-currentRequest = null;
-
 
 // https://stackoverflow.com/questions/34495796/javascript-promises-with-filereader
 function readFile(file) {

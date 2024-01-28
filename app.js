@@ -182,7 +182,10 @@ app.post('/imgs/add', function (request, response) {
 
     for (let i = 0; i < imgs.length; i++) {
         if (imgs[i][0] === request.body.ID) {
-            console.log(imgs[i]);
+            if (imgs[i][1].includes(request.body.img)) {
+                response.sendStatus(409);
+                return;
+            }
             imgs[i][1].push(request.body.img);
             response.sendStatus(201);
             return;
@@ -225,7 +228,7 @@ app.post('/restaurant/add/', function (request, response) {
 
     const restaurant = { name: request.body.name, rating: 0, description: request.body.description, phone_number: request.body.phone_number, address: addressArr, opening_times: openingTimes, ID: id };
 
-    imgs.push({ ID: id, imgs: [] });
+    imgs.push([id, []]);
 
     restaurants.push(restaurant);
     response.sendStatus(201);
