@@ -19,7 +19,6 @@ function isOk(response) {
 
 // handles error, outputs message as modal
 function handleError(e) {
-    console.error(e)
     if (document.getElementById('errorModal').classList.contains('show')) {
         return;
     }
@@ -82,7 +81,7 @@ async function loadRestaurant(ID) {
         const reviews = await getRequest('/reviews/?restaurantID=' + ID);
         const events = await getRequest('/events/?upcoming=T&restaurantID=' + ID);
         const imgs = await getRequest('/imgs/?all=T&ID=' + ID);
-    
+
         // prevents previous request, if there is one to display info if arrived later
         if (document.getElementById('search-view').style.display === 'block' || info['ID'] !== currentInfoID) {
             document.getElementById('spinner').style.display = 'none';
@@ -126,7 +125,7 @@ async function loadRestaurant(ID) {
             html += `<div class="border px-2 pb-2"><h4>${review['title']}</h4>
             <div id="stars${i}"></div>
             <h5>${review['name']}</h5>
-            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${review['ID']}, 'review')" id="${review['ID']}">Expand</a>
+            <a href="#" class="btn btn-primary btn-sm" onclick="showReviewModal(${review['ID']})" id="${review['ID']}">Expand</a>
             </div>
             `;
         }
@@ -141,7 +140,7 @@ async function loadRestaurant(ID) {
             event = events[i];
             html += `<div class="border px-2 pb-2"><h4>${event['name']}</h4>
             <p>${event['start'].replace('T', ' ')}</p>
-            <a href="#" class="btn btn-primary btn-sm" onclick="showInfoModal(${event['ID']}, 'event')" id="${event['ID']}">Expand</a>
+            <a href="#" class="btn btn-primary btn-sm" onclick="loadEvent(${event['ID']})" id="${event['ID']}">Expand</a>
             </div>
             `;
         }
@@ -149,9 +148,7 @@ async function loadRestaurant(ID) {
 
         // show images of restaurant
         html = '';
-        console.log(imgs.length);
         for (let i = 0; i < imgs.length; i++) {
-            console.log(i);
             html += `<div class='carousel-item item${i === 0 ? ' active' : ''}'>
                         <img src='${imgs[i]}' class='d-block w-100'>
                     </div>`;
@@ -160,7 +157,7 @@ async function loadRestaurant(ID) {
 
         // show the page once all done
         document.getElementById('spinner').style.display = 'none';
-        document.getElementById('info-view').style.display = 'block';
+        document.getElementById('restaurant-view').style.display = 'block';
         document.getElementById('reviews').scroll(0, 0);
     } catch (e) {
         handleError(e)
@@ -168,39 +165,33 @@ async function loadRestaurant(ID) {
 }
 
 async function loadEvent(ID) {
-
-    currentEventID = ID.toString();
-    document.getElementById('spinner').style.display = 'block';
-    tableBody = document.getElementById('tableBody');
-    const content = document.getElementById('info');
-    let html = '';
     try {
         const event = await getRequest('/event/?ID=' + ID);
-        const restaurantInfo = await getRequest('/restaurant/?ID=' + info['restaurantID']);
-
-        if (document.getElementById('searchArea').style.display === 'block' || info['ID'] !== currentInfoID) {
-            document.getElementById('spinner').style.display = 'none';
+        const restaurantInfo = await getRequest('/restaurant/?ID=' + event['restaurantID']);
+        document.getElementById('eventTitleModal').innerHTML = event['name'];
+        document.getElementById('times').innerHTML = `${event['start'].replace('T', ' ')} to ${event['end'].replace('T',' ')}`;
+        document.getElementById('eventDescription').innerHTML = event['description'];
+        let img = await fetch('/imgs/?ID=' + restaurantInfo['ID']);
+        if (!isOk(img)) {
             return;
         }
-        html = '';
-        document.getElementById('nameTitle').innerHTML = info['title'];
-        document.getElementById('description').innerHTML = info['description'];
-        if (isOpen(info['opening_times'])) {
-
-            document.getElementById('currentlyOpen').innerHTML = 'Open, closes at ' + info['opening_times'][new Date().getDay() > 0 ? new Date().getDay() - 1 : 6][1];
-            document.getElementById('currentlyOpen').style.color = 'green';
+        if (img.status !== 204) {
+            img = await img.json();
+            img = img[0];
         } else {
-            document.getElementById('currentlyOpen').innerHTML = 'Closed';
-            document.getElementById('currentlyOpen').style.color = 'red';
+            img = '/imgs/placeholder.svg';
         }
-        document.getElementById('addressInfo').innerHTML = `${info['address'].join(', ')}`;
-        document.getElementById('phoneNumberInfo').innerHTML = info['phone_number'];
-        document.getElementById('ratingInfo').innerHTML = `${info['rating'].toFixed(1)} (${reviews.length} reviews)`;
-        drawStars('starsInfo', info['rating']);
+        document.getElementById('restaurantImg').src = img;
+        document.getElementById('openRestaurantPage').onclick = function () {
+            changeView('info', restaurantInfo['ID']);
+            new bootstrap.Modal(document.getElementById('eventModal'), {}).hide();
+        };
 
-        document.getElementById('spinner').style.display = 'none';
-        document.getElementById('info').style.display = 'block';
-        document.getElementById('reviews').scroll(0, 0);
+        if (event['start'] < currDate && event['end'] > currDate) {
+            document.getElementById('currentlyOnEvent').innerHTML = 'Currently on!'
+        }
+
+        new bootstrap.Modal(document.getElementById('eventModal'), {}).show()
     } catch (e) {
         handleError(e)
     }
@@ -213,7 +204,6 @@ async function search(rating = '', city = '', name = '') {
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
         const data = await getRequest(searchType === 1 ? '/restaurants?' + query : '/events?' + query);
-        console.log(data);
 
         // if no info show such is the case
         const results = document.getElementById('results');
@@ -230,7 +220,7 @@ async function search(rating = '', city = '', name = '') {
                         <div class="card-body">
                         <h5 class="card-title text-nowrap" href=# style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${title}</h5>
                         <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${data[i]["description"]}</p>
-                        <a href="#" class="btn btn-primary" onclick="changeView('info', ${data[i].ID})" id="${data[i].ID}">Info Page</a>
+                        <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? `"changeView('info', ${data[i].ID})"` : `"loadEvent(${data[i].ID})"`} id="${data[i].ID}">Info Page</a>
                         </div>
                     </div>
                     </div>`;
@@ -242,20 +232,17 @@ async function search(rating = '', city = '', name = '') {
 }
 
 // displays info of review/event clicked by user on a modal
-async function showInfoModal(ID, type) {
+async function showReviewModal(ID) {
     try {
-        const info = await getRequest(`/${type}/?ID=${ID}`);
-
-        document.getElementById('infoTitleModal').innerHTML = type === 'review' ? info['title'] : info['name'];
-        document.getElementById('infoBody').innerHTML = type === 'review' ? `<div id="reviewBodyStars"></div>
+        const info = await getRequest(`/review/?ID=${ID}`);
+        document.getElementById('infoTitleModal').innerHTML = info['title'];
+        document.getElementById('infoBody').innerHTML = `<div id="reviewBodyStars"></div>
                                                             <h5>${info['name']}</h5>
-                                                            <p>${info['description']}</p>` : `
-                                                            <p>${info['description']}</p>
-                                                            <p>${info['start']} ${info['end']}</p>`;
-        if (type === 'review') {
-            drawStars('reviewBodyStars', info['rating']);
-        }
-        new bootstrap.Modal(document.getElementById('infoModal'), {}).show()
+                                                            <p>${info['description']}</p>`;
+        
+        drawStars('reviewBodyStars', info['rating']);
+
+        new bootstrap.Modal(document.getElementById('reviewModal'), {}).show()
     } catch (e) {
         handleError(e)
     }
@@ -264,14 +251,13 @@ async function showInfoModal(ID, type) {
 // handles changing the different views
 async function changeView(view, ID = null) {
     // cancels current ongoing request
-    console.log(currentRequest);
     if (currentRequest) {
         currentRequest.cancel();
         currentRequest = null;
     }
     // hides all that arent needed, shows one that does
     document.getElementById('search-view').style.display = 'none';
-    document.getElementById('info-view').style.display = 'none';
+    document.getElementById('restaurant-view').style.display = 'none';
     document.getElementById('spinner').style.display = 'none';
     if (view === 'search') {
         document.getElementById('search-view').style.display = 'block';
@@ -406,12 +392,16 @@ async function postForm(formID, type, needRestaurantID = false) {
 
 const reviewForm = document.getElementById('review-form');
 reviewForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    await postForm('review-form', 'review', true);
-    event.target.reset()
-    scroll(0, 0);
-    new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
-    loadRestaurant(currentInfoID);
+    try {
+        event.preventDefault();
+        await postForm('review-form', 'review', true);
+        event.target.reset()
+        scroll(0, 0);
+        new bootstrap.Collapse(document.getElementById('collapseFormReview')).toggle();
+        loadRestaurant(currentInfoID);
+    } catch (e) {
+        handleError(e);
+    }
 });
 
 const eventForm = document.getElementById('event-form');
@@ -454,29 +444,33 @@ restaurantForm.addEventListener('submit', async (event) => {
 });
 
 async function uploadImg(files) {
-    const fileType = files[0].type;
-    if (!(fileType === 'image/jpeg' || fileType === 'image/jpg')) {
-        throw new Error('File type must be of JPEG/JPG type')
-    }
+    try {
+        const fileType = files[0].type;
+        if (!(fileType === 'image/jpeg' || fileType === 'image/jpg')) {
+            throw new Error('File type must be of JPEG/JPG type')
+        }
 
-    const base64Img = await readFile(files[0]);
+        const base64Img = await readFile(files[0]);
 
-    const data = { ID: currentInfoID, img: base64Img };
-    currentRequest = await fetch('/imgs/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    if (currentRequest.status === 409) {
+        const data = { ID: currentInfoID, img: base64Img };
+        currentRequest = await fetch('/imgs/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        if (currentRequest.status === 409) {
+            currentRequest = null;
+            throw new Error('Image already exists')
+        }
+
+        scroll(0, 0);
+        loadRestaurant(currentInfoID);
         currentRequest = null;
-        throw new Error('Image already exists')
+    } catch (e) {
+        handleError(e);
     }
-
-    scroll(0, 0);
-    loadRestaurant(currentInfoID);
-    currentRequest = null;
 }
 
 // https://stackoverflow.com/questions/34495796/javascript-promises-with-filereader

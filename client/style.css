@@ -28,11 +28,20 @@ fixes the problem where changing inner html would shift the element */
 }
 
 #imgCarousel {
-    max-width: 600px; /* Set a maximum width for the carousel */
-    margin: auto; /* Center the carousel on the page */
+    max-width: 600px;
+    margin: auto;
 }
 
 #imgHolder img {
-    max-width: 100%; /* Ensure images inside the carousel don't exceed the container width */
-    height: auto; /* Maintain the aspect ratio of images */
+    max-width: 100%;
+    height: auto;
+}
+
+.carousel-item {
+height: 300px;
+overflow: hidden;
+width: 100%;
+}
+.carousel-item img {
+width: 100%;
 }

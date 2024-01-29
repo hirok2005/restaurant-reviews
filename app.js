@@ -180,7 +180,6 @@ app.get('/imgs/', function (request, response) {
         return;
     }
 
-    console.log(arr.length, request.query.all);
     if (request.query.all === 'T') {
         response.json(arr[1]);
     } else {
