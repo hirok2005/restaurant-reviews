@@ -37,6 +37,8 @@ fixes the problem where changing inner html would shift the element */
     height: auto;
 }
 
+
+/* https://stackoverflow.com/questions/49844515/how-do-i-stop-my-bootstrap-carousel-from-changing-size#:~:text=You%20can%20assign%20fixed%20height,adding%20this%20to%20your%20css. */
 .carousel-item {
 height: 300px;
 overflow: hidden;

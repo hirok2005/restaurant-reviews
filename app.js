@@ -57,6 +57,7 @@ app.get('/restaurants/', function (request, response) {
     filterRestaurants = filterRestaurants.map((restaurant) => ({ ID: restaurant.ID, name: restaurant.name, description: restaurant.description }));
     if (filterRestaurants.length === 0) {
         response.sendStatus(204);
+        return;
     }
     response.json(filterRestaurants);
 });
@@ -93,6 +94,7 @@ app.get('/reviews/', function (request, response) {
     filterReviews = filterReviews.map((review) => ({ ID: review.ID, title: review.title, name: review.name, rating: review.rating }));
     if (filterReviews.length === 0) {
         response.sendStatus(204);
+        return;
     }
     response.json(filterReviews);
 });
@@ -124,7 +126,7 @@ app.get('/events/', function (request, response) {
         filterEvents = eventSearch.search(request.query.name).map(item => item.item);
     }
     if (request.query.restaurantID !== undefined && request.query.restaurantID !== '') {
-        filterEvents = events.filter(event => event.restaurantID === request.query.restaurantID);
+        filterEvents = filterEvents.filter(event => event.restaurantID === request.query.restaurantID);
     }
     if (request.query.city !== undefined && request.query.city !== '') {
         filterEvents = filterEvents.filter(event => event.city.toLowerCase() === request.query.city.toLowerCase().trim());
@@ -209,6 +211,7 @@ app.post('/imgs/add', function (request, response) {
             }
             imgs[i][1].push(request.body.img);
             response.sendStatus(201);
+            fs.writeFileSync(path.join(__dirname, 'imgs.json'), JSON.stringify(imgs));
             return;
         }
     }
@@ -239,13 +242,13 @@ app.post('/restaurant/add/', function (request, response) {
     for (let i = 0; i < paramDays.length; i++) {
         days = paramDays[i];
         if (request.body[days[0]] === '') {
-            openingTimes.push(['', '']);
+            openingTimes[i] = ['', ''];
         } else {
             if (request.body[days[1]] === undefined || request.body[days[0]] > request.body[days[1]]) {
                 response.sendStatus(400);
                 return;
             }
-            openingTimes.push([request.body[days[0]], request.body[days[0]]]);
+            openingTimes[i] = [request.body[days[0]], request.body[days[1]]];
         }
     }
 
@@ -259,6 +262,7 @@ app.post('/restaurant/add/', function (request, response) {
     imgs.push([id, []]);
 
     restaurants.push(restaurant);
+    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify({ restaurants, reviews, events }));
     response.sendStatus(201);
 });
 
@@ -268,6 +272,7 @@ app.post('/review/add', function (request, response) {
 
     if (paramsReview.filter(key => !(key in request.body)).length > 0) {
         response.sendStatus(400);
+        return;
     }
 
     // ensure review doesnt already exist
@@ -289,6 +294,7 @@ app.post('/review/add', function (request, response) {
 
     if (!restaurantFound) {
         response.sendStatus(404);
+        return;
     }
 
     const lastReview = reviews[reviews.length - 1];
@@ -303,6 +309,7 @@ app.post('/review/add', function (request, response) {
         }
     }
     reviews.push(review);
+    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify({ restaurants, reviews, events }));
     response.sendStatus(201);
 });
 
@@ -312,6 +319,7 @@ app.post('/event/add', function (request, response) {
 
     if (paramsEvent.filter(key => !(key in request.body)).length > 0) {
         response.sendStatus(400);
+        return;
     }
 
     const date = new Date().toISOString();
@@ -342,12 +350,14 @@ app.post('/event/add', function (request, response) {
 
     if (!restaurantFound) {
         response.sendStatus(404);
+        return;
     }
 
     const lastEvent = reviews[events.length - 1];
     const id = lastEvent ? (parseInt(lastEvent.ID) + 1).toString() : '1';
     const event = { name: request.body.name, description: request.body.description, start: request.body.start, end: request.body.end, city: cityRest, restaurantID: request.body.restaurantID, ID: id };
     events.push(event);
+    fs.writeFileSync(path.join(__dirname, 'data.json'), JSON.stringify({ restaurants, reviews, events }));
     response.sendStatus(201);
 });
 

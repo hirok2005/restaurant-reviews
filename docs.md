@@ -212,7 +212,6 @@ status: 200
 #### No results found
 
 ```JSON
-[]
 status: 204
 ```
 
@@ -351,7 +350,7 @@ try {
 
 ### Example Responses
 
-All responses will return JSON containing list of reviews, can be empty if nothing  meets criteria
+All responses will return JSON containing list of events, can be empty if nothing  meets criteria
 
 #### Results found
 

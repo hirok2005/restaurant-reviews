@@ -30,7 +30,7 @@ function handleError(e) {
 }
 
 // handles all get requests
-// returns arrau
+// returns array
 async function getRequest(url) {
     try {
         currentRequest = await fetch(url);
@@ -243,13 +243,14 @@ async function search(rating = '', city = '', name = '') {
         let html = '';
         for (let i = 0; i < data.length; i++) {
             let title = data[i]['name']
-            html += `<div class="col mb-3"><div class="card h-100">
+            html += `<div class="col mb-3">
+                        <div class="card h-100">
                         <div class="card-body">
                         <h5 class="card-title text-nowrap" href=# style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${title}</h5>
                         <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">${data[i]["description"]}</p>
                         <a href="#" class="btn btn-primary" onclick=${searchType === 1 ? `"changeView('info', ${data[i].ID})"` : `"loadEvent(${data[i].ID})"`} id="${data[i].ID}">Info Page</a>
                         </div>
-                    </div>
+                        </div>
                     </div>`;
         }
         results.innerHTML = html;
@@ -321,7 +322,6 @@ function changeColourMode() {
     }
     document.documentElement.setAttribute('data-bs-theme', 'dark');
 }
-
 
 // shows the placeholders while waiting for search request
 function searchPlaceHolder() {
