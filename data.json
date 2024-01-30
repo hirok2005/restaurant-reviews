@@ -4,7 +4,6 @@
             "name": "Turtle Bay Durham",
             "rating": 4.9,
             "description": "Caribbean restaurant seriving authentic food in the heart of Durham. Choose from a variety of items which the chefs will prepare with care, while you get a great view of the Durham cathedral",
-            "style": "Caribbean",
             "phone_number": "0191 359 2130",
             "address": [
                 "Unit R07 The Riverwalk",
@@ -47,7 +46,6 @@
             "name": "Tapas Factory",
             "rating": 4.3,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
-            "style": "Spanish",
             "phone_number": "0191 384 5578",
             "address": [
                 "14 Elvet Bridge",
@@ -90,7 +88,6 @@
             "name": "The Food Pit",
             "rating": 4.2,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
-            "style": "food hall",
             "phone_number": "0191 406 3002",
             "address": [
                 "1 Framwelgate Waterside",
@@ -133,7 +130,6 @@
             "name": "Fat Hippo Durham",
             "rating": 4.4,
             "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil commodi odio officia eligendi a totam ad repellendus optio sit tenetur sunt qui vero accusantium, quo consequuntur explicabo corporis sed consequatur.",
-            "style": "Burgers",
             "phone_number": "0191 370 9699",
             "address": [
                 "36 Saddler Street",

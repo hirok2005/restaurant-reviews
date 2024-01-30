@@ -54,7 +54,7 @@ app.get('/restaurants/', function (request, response) {
     if (request.query.rating !== undefined) {
         filterRestaurants = filterRestaurants.filter(restaurant => restaurant.rating >= parseInt(request.query.rating));
     }
-    filterRestaurants = filterRestaurants.map((restaurant) => ({ ID: restaurant.ID, name: restaurant.name, description: restaurant.description, img: restaurant.img }));
+    filterRestaurants = filterRestaurants.map((restaurant) => ({ ID: restaurant.ID, name: restaurant.name, description: restaurant.description }));
     if (filterRestaurants.length === 0) {
         response.sendStatus(204);
     }
@@ -233,12 +233,15 @@ app.post('/restaurant/add/', function (request, response) {
     }
 
     // santise times, if empty means closed
-    const openingTimes = [];
-    for (const days of paramDays) {
+    // assume missing means closed
+    const openingTimes = Array.from({ length: 7 }, () => ['', '']);
+    let days;
+    for (let i = 0; i < paramDays.length; i++) {
+        days = paramDays[i];
         if (request.body[days[0]] === '') {
             openingTimes.push(['', '']);
         } else {
-            if (request.body[days[0]] > request.body[days[1]]) {
+            if (request.body[days[1]] === undefined || request.body[days[0]] > request.body[days[1]]) {
                 response.sendStatus(400);
                 return;
             }
@@ -319,7 +322,6 @@ app.post('/event/add', function (request, response) {
         return;
     }
 
-    // ensure restaurant exists
     for (const event of events) {
         if (event.restaurantID === request.body.restaurantID && event.name === request.body.name) {
             response.sendStatus(409);
@@ -327,6 +329,7 @@ app.post('/event/add', function (request, response) {
         }
     }
 
+    // ensure restaurant exists
     let cityRest;
     let restaurantFound = false;
     for (const restaurant of restaurants) {
