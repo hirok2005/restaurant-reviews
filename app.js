@@ -170,6 +170,7 @@ app.get('/imgs/', function (request, response) {
             break;
         }
     }
+
     if (arr === null) {
         response.sendStatus(404);
         return;
@@ -191,6 +192,11 @@ app.get('/imgs/', function (request, response) {
 app.post('/imgs/add', function (request, response) {
     response.setHeader('Content-Type', 'application/json');
     if (paramsImg.filter(key => !(key in request.body)).length > 0) {
+        response.sendStatus(400);
+        return;
+    }
+
+    if (!(request.body.img.startsWith('data:image/jpeg;base64,') || request.body.img.startsWith('data:image/jpeg;base64,'))) {
         response.sendStatus(400);
         return;
     }

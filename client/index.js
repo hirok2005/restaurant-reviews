@@ -48,6 +48,7 @@ async function getRequest(url) {
         return data;
     } catch (e) {
         handleError(e);
+        return null;
     }
 }
 
@@ -79,8 +80,19 @@ async function loadRestaurant(ID) {
         }
         // get all related info
         const reviews = await getRequest('/reviews/?restaurantID=' + ID);
+        if (reviews === null) {
+            return;
+        }
+
         const events = await getRequest('/events/?upcoming=T&restaurantID=' + ID);
+        if (events === null) {
+            return;
+        }
+
         const imgs = await getRequest('/imgs/?all=T&ID=' + ID);
+        if (imgs === null) {
+            return;
+        }
 
         // prevents previous request, if there is one to display info if arrived later
         if (document.getElementById('search-view').style.display === 'block' || info['ID'] !== currentInfoID) {
@@ -118,6 +130,9 @@ async function loadRestaurant(ID) {
 
         // show reviews in overflow div with expand button
         html = '';
+        if (reviews.length === 0) {
+            html = `<div class="border px-2 pb-2"><h4 style="text-align:center">Currently no reviews</h4></div>`;
+        }
         const ratings = [];
         for (let i = 0; i < reviews.length; i++) {
             review = reviews[i];
@@ -136,6 +151,9 @@ async function loadRestaurant(ID) {
 
         // same as reviews but for events
         html = '';
+        if (events.length === 0) {
+            html = `<div class="border px-2 pb-2"><h4 style="text-align:center">Currently no reviews</h4></div>`;
+        }
         for (let i = 0; i < events.length; i++) {
             event = events[i];
             html += `<div class="border px-2 pb-2"><h4>${event['name']}</h4>
@@ -167,7 +185,13 @@ async function loadRestaurant(ID) {
 async function loadEvent(ID) {
     try {
         const event = await getRequest('/event/?ID=' + ID);
+        if (event === null) {
+            return;
+        }
         const restaurantInfo = await getRequest('/restaurant/?ID=' + event['restaurantID']);
+        if (restaurantInfo === null) {
+            return;
+        }
         document.getElementById('eventTitleModal').innerHTML = event['name'];
         document.getElementById('times').innerHTML = `${event['start'].replace('T', ' ')} to ${event['end'].replace('T',' ')}`;
         document.getElementById('eventDescription').innerHTML = event['description'];
@@ -204,6 +228,9 @@ async function search(rating = '', city = '', name = '') {
     const query = searchType === 1 ? `rating=${rating}&city=${city}&name=${name}` : `city=${city}&name=${name}`;
     try {
         const data = await getRequest(searchType === 1 ? '/restaurants?' + query : '/events?' + query);
+        if (data === null) {
+            return;
+        }
 
         // if no info show such is the case
         const results = document.getElementById('results');
@@ -241,6 +268,9 @@ async function showReviewModal(ID) {
                                                             <p>${info['description']}</p>`;
         
         drawStars('reviewBodyStars', info['rating']);
+        if (info === null) {
+            return;
+        }
 
         new bootstrap.Modal(document.getElementById('reviewModal'), {}).show()
     } catch (e) {

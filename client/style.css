@@ -15,9 +15,9 @@ textarea {
 }
 
 /* adding scroll bar from https://stackoverflow.com/questions/40112618/bootstrap4-adding-scrollbar-to-div */
-#reviews {
+#reviews, #events {
     height: 250px;
-    width: 400px;
+    width: 350px;
     overflow-y: auto;
 }
 

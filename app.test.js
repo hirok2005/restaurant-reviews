@@ -7,24 +7,44 @@ describe('GET methods tests', () => {
         return request(app).get('/restaurants').query().expect(200)
     })
 
+    test('List restaurants, default list (return all)', () => {
+        return request(app).get('/restaurants').query().expect('Content-type', /json/)
+    })
+
     test('List restaurants, with all  query parameters', () => {
         return request(app).get('/restaurants').query({name: 'Tapas Factor', city: 'Durham', rating: '2'}).expect(200)
+    })
+
+    test('List restaurants, with all  query parameters', () => {
+        return request(app).get('/restaurants').query({name: 'Tapas Factor', city: 'Durham', rating: '2'}).expect('Content-type', /json/)
     })
 
     test('List restaurants, for specific restaurant', () => {
         return request(app).get('/restaurants').query({name: 'Tapas Factory'}).expect(200)
     })
 
+    test('List restaurants, for specific restaurant', () => {
+        return request(app).get('/restaurants').query({name: 'Tapas Factory'}).expect('Content-type', /json/)
+    })
+
     test('List restaurants, for specific restaurant (with spelling mistake)', () => {
         return request(app).get('/restaurants').query({name: 'Tapas Fator'}).expect(200)
     })
     
+    test('List restaurants, for specific restaurant (with spelling mistake)', () => {
+        return request(app).get('/restaurants').query({name: 'Tapas Fator'}).expect('Content-type', /json/)
+    })
+
     test('List restaurants, with name that returns no results', () => {
         return request(app).get('/restaurants').query({name: '8vn7847549875n4'}).expect(204)
     })
 
     test('List restaurants, using City', () => {
         return request(app).get('/restaurants').query({city: 'Durham'}).expect(200)
+    })
+
+    test('List restaurants, using City', () => {
+        return request(app).get('/restaurants').query({city: 'Durham'}).expect('Content-type', /json/)
     })
 
     test('List restaurants, using non existant City', () => {
@@ -35,8 +55,16 @@ describe('GET methods tests', () => {
         return request(app).get('/restaurants').query({rating: '2'}).expect(200)
     })
 
+    test('List restaurants, using rating', () => {
+        return request(app).get('/restaurants').query({rating: '2'}).expect('Content-type', /json/)
+    })
+
     test('List reviews, for existing restaurant', () => {
         return request(app).get('/reviews').query({restaurantID: '1'}).expect(200)
+    })
+
+    test('List reviews, for existing restaurant', () => {
+        return request(app).get('/reviews').query({restaurantID: '1'}).expect('Content-type', /json/)
     })
 
     test('List reviews , for non existant restaurant', () => {
@@ -47,6 +75,10 @@ describe('GET methods tests', () => {
         return request(app).get('/reviews').query({rating: '1'}).expect(200)
     })
     
+    test('List reviews , using rating that is less than max existing rating', () => {
+        return request(app).get('/reviews').query({rating: '1'}).expect('Content-type', /json/)
+    })
+
     test('List reviews , using rating that is greater than max existing rating', () => {
         return request(app).get('/reviews').query({rating: '6'}).expect(204)
     })
@@ -55,12 +87,20 @@ describe('GET methods tests', () => {
         return request(app).get('/events').query({restaurantID: '1'}).expect(200)
     })
 
+    test('List events, for existing restaurant', () => {
+        return request(app).get('/events').query({restaurantID: '1'}).expect('Content-type', /json/)
+    })
+
     test('List events, for non existant restaurant', () => {
         return request(app).get('/events').query({restaurantID: '-1'}).expect(204)
     })
-    
+
     test('List events, for existing city', () => {
         return request(app).get('/events').query({city: 'Durham'}).expect(200)
+    })
+
+    test('List events, for existing city', () => {
+        return request(app).get('/events').query({city: 'Durham'}).expect('Content-type', /json/)
     })
 
     test('List events, for non existant city', () => {
@@ -71,6 +111,10 @@ describe('GET methods tests', () => {
         return request(app).get('/restaurant').query({ID: '1'}).expect(200)
     })
     
+    test('Get specific restaurant, that exists', () => {
+        return request(app).get('/restaurant').query({ID: '1'}).expect('Content-type', /json/)
+    })
+
     test('Get specific restaurant, that does not exists', () => {
         return request(app).get('/restaurant').query({ID: '-1'}).expect(404)
     })
@@ -79,6 +123,10 @@ describe('GET methods tests', () => {
         return request(app).get('/review').query({ID: '1'}).expect(200)
     })
     
+    test('Get specific review, that exists', () => {
+        return request(app).get('/review').query({ID: '1'}).expect('Content-type', /json/)
+    })
+
     test('Get specific review, that does not exists', () => {
         return request(app).get('/review').query({ID: '-1'}).expect(404)
     })
@@ -87,8 +135,16 @@ describe('GET methods tests', () => {
         return request(app).get('/event').query({ID: '1'}).expect(200)
     })
     
+    test('Get specific event, that exists', () => {
+        return request(app).get('/event').query({ID: '1'}).expect('Content-type', /json/)
+    })
+
     test('Get specific event, that does not exists', () => {
         return request(app).get('/event').query({ID: '-1'}).expect(404)
+    })
+
+    test('Get all images for a valid restaurant', () => {
+        return request(app).get('/imgs/').query({ID: '1'}).expect(204)
     })
 })
 
@@ -158,6 +214,14 @@ describe('POST methods tests', () => {
     test('Add an event with invalid times (Start date is before current date)', () => {
         return request(app).post('/event/add').send({name: '1% off', description: 'Huge deals!!!', end: '2025-02-14T12:30',
         start: '2021-02-14T12:30', restaurantID: '-1'}).expect(400)
+    })
+
+    test('Add an image', () => {
+        return request(app).post('/imgs/add').send({ID: '1', img: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q=='}).expect(201)
+    })
+
+    test('Add an image, not a JPG/JPEG', () => {
+        return request(app).post('/imgs/add').send({ID: '1', img: 'data:image/png;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q=='}).expect(400)
     })
 
 })
